@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>🌸 Thiệp 20/10 tặng Em Gái</title>
+  <meta name="description" content="Thiệp web vui nhộn chúc mừng 20/10 dành cho em gái" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    body{margin:0;font-family:Poppins,sans-serif;background:linear-gradient(135deg,#ffeaf3,#e6e6ff);color:#333;overflow-x:hidden;text-align:center}
+    .glass{background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:16px;padding:20px;margin:20px auto;max-width:800px;box-shadow:0 8px 20px rgba(0,0,0,.1)}
+    header{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;position:sticky;top:0;background:rgba(255,255,255,.6);backdrop-filter:blur(8px)}
+    h1{font-family:Pacifico,cursive;color:#ff2f7a;margin:0;font-size:22px}
+    button{border:none;border-radius:10px;padding:10px 16px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,#ff5c9a,#7a5cff);color:#fff;box-shadow:0 5px 10px rgba(0,0,0,.1)}
+    button:hover{opacity:.9}
+    .envelope{position:relative;width:300px;height:200px;margin:30px auto;cursor:pointer;}
+    .env-body{position:absolute;inset:0;background:#fff;border-radius:10px;box-shadow:0 5px 15px rgba(0,0,0,.2)}
+    .env-flap{position:absolute;inset:0;clip-path:polygon(0 0,100% 0,50% 60%);background:linear-gradient(180deg,#fff 0%,#ffe3ef 80%);transform-origin:50% 0;transition:transform .6s}
+    .envelope.open .env-flap{transform:rotateX(180deg)}
+    .letter{max-height:0;overflow:hidden;transition:max-height 1s ease}
+    .letter.open{max-height:600px}
+    .paper{background:#fff;border-radius:10px;padding:20px;box-shadow:0 5px 10px rgba(0,0,0,.1);margin:10px auto;max-width:500px}
+    .typed{white-space:pre-wrap;min-height:60px}
+    .fun-section{display:grid;gap:16px;grid-template-columns:1fr;max-width:800px;margin:0 auto;padding:20px}
+    .widget{background:rgba(255,255,255,.6);backdrop-filter:blur(8px);border-radius:12px;padding:20px;box-shadow:0 5px 10px rgba(0,0,0,.1)}
+    .kudos{display:flex;align-items:center;justify-content:center;gap:12px}
+    .kudos .count{font-size:30px;font-weight:700;color:#ff2f7a}
+    .game{margin-top:20px}
+    .balloon{font-size:40px;cursor:pointer;animation:float 3s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    footer{text-align:center;font-size:12px;color:#666;margin:40px 0}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Thiệp 20/10 cho Em Gái 💕</h1>
+  <div>
+    <button id="toggleMusic">🎵 Bật nhạc</button>
+    <button id="spawnConfetti">✨ Bắn tim</button>
+  </div>
+</header>
+
+<section class="glass">
+  <h2>Gửi em gái yêu dấu 🌸</h2>
+  <p>Nhấn vào phong bì để mở thư bí mật nhé!</p>
+  <div class="envelope" id="envelope">
+    <div class="env-body"></div>
+    <div class="env-flap"></div>
+  </div>
+  <div id="letter" class="letter">
+    <div class="paper">
+      <h3>Thư gửi em Hằng</h3>
+      <div id="typed" class="typed"></div>
+      <div>
+        <button id="retype">↻ Gõ lại</button>
+        <button id="editMsg">✍️ Sửa lời chúc</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="fun-section">
+  <div class="widget">
+    <h4> Máy đếm tiền</h4>
+    <div class="kudos">
+      <div class="count" id="kudosCount">0</div>
+      <button id="kudosBtn">+1 Tuyệt vời!</button>
+      <button id="kudosReset">Đặt lại</button>
+    </div>
+  </div>
+  <div class="widget">
+    <h4>🎈 Trò chơi thả bóng bay</h4>
+    <p>Nhấn vào bóng bay để làm nó nổ và nhận lời chúc vui nhé!</p>
+    <div id="balloonArea" class="game"></div>
+  </div>
+</section>
+
+<section class="glass">
+  <h4>📝 Lời nhắn viết tay</h4>
+  <input id="noteInput" type="text" placeholder="Viết thêm lời nhắn…">
+  <button id="addNote">Thêm vào thư</button>
+</section>
+
+<footer>
+  Làm bằng 💗 để chúc mừng em gái nhân ngày 20/10 · Đặt file <code>music.mp3</code> cạnh tệp này để phát nhạc nền.
+</footer>
+
+<audio id="bgm" loop preload="auto"><source src="music.mp3" type="audio/mpeg"></audio>
+<script>
+const envelope=document.getElementById('envelope');const letter=document.getElementById('letter');const typed=document.getElementById('typed');const retype=document.getElementById('retype');const editMsg=document.getElementById('editMsg');const kudosBtn=document.getElementById('kudosBtn');const kudosReset=document.getElementById('kudosReset');const kudosCount=document.getElementById('kudosCount');const noteInput=document.getElementById('noteInput');const addNote=document.getElementById('addNote');const bgm=document.getElementById('bgm');const toggleMusic=document.getElementById('toggleMusic');const spawnConfetti=document.getElementById('spawnConfetti');
+let baseMsg=`Chúc mừng 20/10! 💕\n\nChúc em gái luôn xinh đẹp, học giỏi, vui vẻ và hạnh phúc mỗi ngày!\n\nHôm nay nhớ ăn ngon, cười tươi và nhận thật nhiều hoa nhé! 🌸💝`;
+let typingTimer;
+function typewriter(text){clearInterval(typingTimer);typed.textContent='';let i=0;typingTimer=setInterval(()=>{typed.textContent+=text[i]||'';i++;if(i>=text.length)clearInterval(typingTimer);},25);}
+
+// Envelope open
+envelope.addEventListener('click',()=>{envelope.classList.toggle('open');const isOpen=envelope.classList.contains('open');letter.classList.toggle('open',isOpen);if(isOpen)typewriter(baseMsg);});
+retype.addEventListener('click',()=>typewriter(baseMsg));
+editMsg.addEventListener('click',()=>{const val=prompt('Nhập lời chúc của bạn:',baseMsg);if(val&&val.trim().length>3){baseMsg=val.trim();typewriter(baseMsg);}});
+
+// Kudos counter
+const KKEY='kudos-emgai';function loadKudos(){const v=+localStorage.getItem(KKEY)||0;kudosCount.textContent=v;}function saveKudos(v){localStorage.setItem(KKEY,v);}loadKudos();
+kudosBtn.addEventListener('click',()=>{let v=+kudosCount.textContent+1;kudosCount.textContent=v;saveKudos(v);sparkle();});
+kudosReset.addEventListener('click',()=>{saveKudos(0);loadKudos();});
+
+// Balloons game
+const balloonArea=document.getElementById('balloonArea');function spawnBalloon(){const b=document.createElement('div');b.className='balloon';b.textContent=['🎈','🎉','💖','🌸','🩷'][Math.floor(Math.random()*5)];b.style.position='relative';b.addEventListener('click',()=>{alert('Bùm! Một lời chúc bay tới bạn! 💕');b.remove();});balloonArea.appendChild(b);}setInterval(()=>{if(balloonArea.children.length<6)spawnBalloon();},2000);
+
+// Add note
+addNote.addEventListener('click',()=>{const n=noteInput.value.trim();if(!n)return;baseMsg+=`\n\nGhi chú thêm: ${n}`;noteInput.value='';typewriter(baseMsg);});
+
+// Music toggle
+let musicOn=false;toggleMusic.addEventListener('click',async()=>{try{if(!musicOn){await bgm.play();toggleMusic.textContent='⏸️ Tắt nhạc';}else{bgm.pause();toggleMusic.textContent='🎵 Bật nhạc';}musicOn=!musicOn;}catch(e){alert('Chạm vào màn hình rồi bật nhạc nhé!');}});
+
+// Confetti
+function spawnPetal(){const el=document.createElement('div');el.textContent=['🌸','🌺','💖','💐','🌷'][Math.floor(Math.random()*5)];el.style.position='fixed';el.style.left=Math.random()*100+'vw';el.style.top='-20px';el.style.fontSize='18px';el.style.animation=`fall ${5+Math.random()*5}s linear forwards`;document.body.appendChild(el);setTimeout(()=>el.remove(),10000);}
+function sparkle(){for(let i=0;i<8;i++)spawnPetal();}
+spawnConfetti.addEventListener('click',()=>{for(let i=0;i<40;i++)setTimeout(spawnPetal,i*30);});
+</script>
+</body>
+</html>
