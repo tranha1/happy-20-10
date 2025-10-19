@@ -35,7 +35,7 @@
       position:fixed;
       inset:0;
       z-index:-9999;
-      background: url('background.jpg') center/cover no-repeat;
+      background: url('https://github.com/tranha1/happy-20-10/main/photos/background/background.jpg') center/cover no-repeat;
       background-attachment: fixed;
     }
 
@@ -164,9 +164,9 @@
             <h3 class="font-display text-xl font-bold">💌 Thư chúc mừng</h3>
             <div class="flex gap-2">
               <button id="openLetterBtn" class="px-3 py-2 rounded-xl bg-rose-500 text-white hover:shadow-glow">Mở thư</button>
-              <button id="saveAll" class="px-3 py-2 rounded-xl bg-white">💾 Lưu</button>
-              <button id="exportJson" class="px-3 py-2 rounded-xl bg-white">⬇️ Export</button>
-              <label class="px-3 py-2 rounded-xl bg-white cursor-pointer">⬆️ Import<input id="importJson" type="file" accept="application/json" class="hidden"></label>
+              <button id="saveAll" class="px-3 py-2 rounded-xl bg-white"> Lưu</button>
+              <button id="exportJson" class="px-3 py-2 rounded-xl bg-white"> Export</button>
+              <label class="px-3 py-2 rounded-xl bg-white cursor-pointer"> Import<input id="importJson" type="file" accept="application/json" class="hidden"></label>
             </div>
           </div>
           <div id="envelope" class="mt-3 relative h-36 rounded-xl overflow-hidden bg-gradient-to-br from-rose-200 to-pink-200 border border-white/60 shadow-soft flex items-center justify-center"><span class="font-display">(Bấm "Mở thư") ✨</span></div>
@@ -325,7 +325,7 @@
 
         <!-- Album: cùng kích thước với Music (col-span-8) -->
         <div class="md:col-span-8 widget glass p-4">
-          <div class="flex items-center justify-between"><h3 class="font-display text-xl font-bold">📷 Album kỉ niệm</h3><label class="px-3 py-2 rounded-xl bg-white hover:shadow-glow cursor-pointer"><input type="file" id="photoInput" accept="image/*" multiple class="hidden">Thêm ảnh</label></div>
+          <div class="flex items-center justify-between"><h3 class="font-display text-xl font-bold"> Album kỉ niệm</h3><label class="px-3 py-2 rounded-xl bg-white hover:shadow-glow cursor-pointer"><input type="file" id="photoInput" accept="image/*" multiple class="hidden">Thêm ảnh</label></div>
           <p class="text-sm text-slate-600 mt-1">Ảnh sẽ tự đổi mỗi <span id="slideSec">4</span>s ở ô Nhạc & Slideshow.</p>
           <div id="albumGrid" class="mt-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
         </div>
@@ -727,7 +727,7 @@
 
     // Album + slideshow
     let slideIdx=0; let slideTimer; let slideImages=[]; const slideSeconds=SLIDE_SECONDS; $('#slideSec').textContent = slideSeconds;
-    function startSlide(){ clearInterval(slideTimer); if(slideImages.length===0){ $('#slideImage').src='background.jpg'; return; } $('#slideImage').src = slideImages[slideIdx % slideImages.length]; slideTimer = setInterval(()=>{ slideIdx=(slideIdx+1)%slideImages.length; $('#slideImage').src = slideImages[slideIdx]; }, slideSeconds*1000); }
+    function startSlide(){ clearInterval(slideTimer); if(slideImages.length===0){ $('#slideImage').src='https://github.com/tranha1/happy-20-10/main/photos/gallery'; return; } $('#slideImage').src = slideImages[slideIdx % slideImages.length]; slideTimer = setInterval(()=>{ slideIdx=(slideIdx+1)%slideImages.length; $('#slideImage').src = slideImages[slideIdx]; }, slideSeconds*1000); }
     $('#photoInput').addEventListener('change', (e)=>{ const grid=$('#albumGrid'); grid.innerHTML=''; slideImages=[]; const files=Array.from(e.target.files||[]); files.slice(0,24).forEach((f,i)=>{ const url=URL.createObjectURL(f); slideImages.push(url); const frame=document.createElement('figure'); frame.className='relative bg-white rounded-xl p-2 pt-3 shadow-soft'; frame.innerHTML=`<img src="${url}" alt="photo" class="w-full h-36 object-cover rounded-lg select-none"/><figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`; grid.appendChild(frame); }); startSlide(); saveState(); });
 
     // Music
@@ -796,6 +796,56 @@
 
     show('gate');
     loadState();
+
+    (async function autoLoadContentFromRepo(){
+  const url = 'https://raw.githubusercontent.com/<tranha1>/<happy-20-1->/<main>/data/content.json';
+  try{
+    const res = await fetch(url, {cache: 'no-store'});
+    if(!res.ok) return;
+    const s = await res.json();
+    // đổ dữ liệu vào giao diện
+    if(s.startLove) document.querySelector('#startLove').value = s.startLove;
+    (s.wishes||[]).forEach(t => {
+      const li = document.createElement('li');
+      li.className = 'bg-white/85 rounded-2xl p-3 shadow-soft flex items-start gap-3';
+      li.innerHTML = `<span>✨</span><span class="break-words">${t}</span>`;
+      document.querySelector('#wishList').appendChild(li);
+    });
+    (s.promiseHim||[]).forEach(t => {
+      const li = document.createElement('li');
+      li.className = 'bg-white/85 rounded-xl px-3 py-2 shadow-soft';
+      li.textContent = t;
+      document.querySelector('#promiseHimList').appendChild(li);
+    });
+    (s.promiseHer||[]).forEach(t => {
+      const li = document.createElement('li');
+      li.className = 'bg-white/85 rounded-xl px-3 py-2 shadow-soft';
+      li.textContent = t;
+      document.querySelector('#promiseHerList').appendChild(li);
+    });
+    (s.timeline||[]).forEach(x => {
+      const li = document.createElement('li');
+      li.className = 'ms-2';
+      li.innerHTML = `<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div>
+        <time class="text-sm text-slate-500">${x.date}</time>
+        <h4 class="font-semibold">${x.title}</h4>
+        <p class="text-slate-700">${x.note||''}</p>`;
+      document.querySelector('#timelineList').appendChild(li);
+    });
+    if(s.musicUrl){ document.querySelector('#musicUrl').value=s.musicUrl; }
+    if(Array.isArray(s.slideImages) && s.slideImages.length){
+      // render album + slideshow luôn
+      const grid = document.querySelector('#albumGrid'); grid.innerHTML='';
+      s.slideImages.forEach((url,i)=>{
+        const f=document.createElement('figure');
+        f.className='relative bg-white rounded-xl p-2 pt-3 shadow-soft';
+        f.innerHTML=`<img src="${url}" class="w-full h-36 object-cover rounded-lg select-none"/>
+                     <figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`;
+        grid.appendChild(f);
+      });
+    }
+  }catch(e){}
+})();
 
     function escapeHtml(str){ return str.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;'); }
   </script>

@@ -1,0 +1,15 @@
+{
+  "startLove": "2024-09-09",
+  "wishes": ["", ""],
+  "promiseHim": ["Anh hứa luôn lắng nghe"],
+  "promiseHer": ["Em hứa luôn tin tưởng"],
+  "timeline": [
+    {"date":"2025-10-20","title":"Cà phê","note":"Góc quen"},
+    {"date":"2025-10-20","title":"Dạo phố","note":"Check-in"}
+  ],
+  "musicUrl": "",
+  "slideImages": [
+    "https://raw.githubusercontent.com/<tranha1>/<happy-20-10>/<main>/photos/anh1.jpg"
+  ],
+  "ghFolder": "https://github.com/<tranha1>/<happy-20-10>/<main>/photos"
+}
