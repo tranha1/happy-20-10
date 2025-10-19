@@ -646,6 +646,18 @@
     let gateIdx = 0; let gateTimer = null; let gateSources = [];
    // Small helper implementations to avoid ReferenceError when code calls refreshGateSources/setGateImages/startGateSlide.
     // These use slideImages if available, otherwise fall back to a single background image.
+    // Resolve relative or protocol-relative URLs to absolute ones (handles "../photo/..." cases)
+    function resolveUrl(path){
+      try{
+        if(!path) return path;
+        // pass through data:, blob:, http(s):, protocol-relative (//) and absolute paths
+        if(/^data:|^blob:|^\/\/|^[a-z][a-z0-9+.-]*:/i.test(path)) return path;
+        return new URL(path, location.href).href;
+      }catch(e){
+        return path;
+      }
+    }
+
     function setGateImages(){
       try{
         const prev = document.getElementById('gatePrev');
@@ -654,9 +666,9 @@
         if(!gateSources || gateSources.length === 0) return;
         const len = gateSources.length;
         const idx = ((gateIdx % len) + len) % len;
-        if(curr) curr.src = gateSources[idx];
-        if(prev) prev.src = gateSources[(idx - 1 + len) % len];
-        if(next) next.src = gateSources[(idx + 1) % len];
+        if(curr) curr.src = resolveUrl(gateSources[idx]);
+        if(prev) prev.src = resolveUrl(gateSources[(idx - 1 + len) % len]);
+        if(next) next.src = resolveUrl(gateSources[(idx + 1) % len]);
 
         // update dots
         const dotsWrap = document.getElementById('gateDots');
@@ -701,7 +713,42 @@
 
       current = page;
     }
-    document.addEventListener('click', e=>{ const b=e.target.closest('[data-goto]'); if(!b) return; show(b.dataset.goto); });
+    // Replace truncated/broken "show" code with a simple safe show() to switch pages.
+    let _currentPage = null;
+    function show(name){
+      const pageMap = {
+        gate: document.getElementById('page-gate'),
+        countdown: document.getElementById('page-countdown'),
+        intro: document.getElementById('page-intro'),
+        content: document.getElementById('page-content'),
+        timeline: document.getElementById('page-timeline')
+      };
+      const target = pageMap[name];
+      if(!_currentPage && target){
+        target.classList.add('active');
+        _currentPage = target;
+        window.scrollTo(0,0);
+        return;
+      }
+      if(_currentPage && _currentPage !== target){
+        _currentPage.classList.remove('active');
+        _currentPage.classList.add('leaving');
+        setTimeout(()=>{ _currentPage.classList.remove('leaving'); }, 350);
+      }
+      if(target){
+        target.classList.add('active');
+        _currentPage = target;
+        window.scrollTo(0,0);
+      }
+    }
+    document.addEventListener('click', e=>{
+      const b = e.target.closest('[data-goto]');
+      if(!b) return;
+      show(b.dataset.goto);
+    });
+
+    // fix hidden video-click binding safely (pages variable might not exist)
+    (function(){ const v=$('#hiddenVideo'); v.src=HIDDEN_VIDEO_URL; v.addEventListener('canplay',()=> v.play().catch(()=>{})); ['page-intro','page-content','page-timeline','page-gate'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('click', ()=> v.play().catch(()=>{})); }); })();
 
     (function(){ const target = new Date(new Date().getFullYear(), 9, 20, 0, 0, 0).getTime(); const el = $('#countText'); setInterval(()=>{ const now=Date.now(); let diff=target-now; if(diff<0) diff=0; const d=Math.floor(diff/86400000), h=Math.floor(diff%86400000/3600000), m=Math.floor(diff%3600000/60000), s=Math.floor(diff%60000/1000); el.textContent = `${d} ngày : ${h} giờ : ${m} phút : ${s} giây`; },1000); })();
 
@@ -728,15 +775,16 @@
     function startSlide(){
       clearInterval(slideTimer);
       if(!slideImages || slideImages.length === 0){
-      // fallback to a single repository background image (use a real image file)
-      $('#slideImage').src = 'https://tranha1.github.io/happy-20-10/photos/gallery';
-      return;
+        // fallback to a single repository background image (use a real image file or GH_FOLDER_URL)
+        const fallback = GH_FOLDER_URL || 'https://tranha1.github.io/happy-20-10/photos/background/background.jpg';
+        $('#slideImage').src = resolveUrl(fallback);
+        return;
       }
       slideIdx = slideIdx % slideImages.length;
-      $('#slideImage').src = slideImages[slideIdx];
+      $('#slideImage').src = resolveUrl(slideImages[slideIdx]);
       slideTimer = setInterval(()=>{
-      slideIdx = (slideIdx + 1) % slideImages.length;
-      $('#slideImage').src = slideImages[slideIdx];
+        slideIdx = (slideIdx + 1) % slideImages.length;
+        $('#slideImage').src = resolveUrl(slideImages[slideIdx]);
       }, slideSeconds * 1000);
     }
 
@@ -863,58 +911,55 @@
     $('#exportJson').addEventListener('click', ()=>{ const data=JSON.stringify(currentState(),null,2); const blob=new Blob([data],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='love20-data.json'; a.click(); });
     $('#importJson').addEventListener('change', async (e)=>{ const f=e.target.files[0]; if(!f) return; const text=await f.text(); localStorage.setItem('love20_state', text); location.reload(); });
 
-    show('gate');
-    loadState();
-
     (async function autoLoadContentFromRepo(){
-  const url = 'https://tranha1.github.io/happy-20-10/data/content.json';
-  try{
-    const res = await fetch(url, {cache: 'no-store'});
-    if(!res.ok) return;
-    const s = await res.json();
-    // đổ dữ liệu vào giao diện
-    if(s.startLove) document.querySelector('#startLove').value = s.startLove;
-    (s.wishes||[]).forEach(t => {
-      const li = document.createElement('li');
-      li.className = 'bg-white/85 rounded-2xl p-3 shadow-soft flex items-start gap-3';
-      li.innerHTML = `<span>✨</span><span class="break-words">${t}</span>`;
-      document.querySelector('#wishList').appendChild(li);
-    });
-    (s.promiseHim||[]).forEach(t => {
-      const li = document.createElement('li');
-      li.className = 'bg-white/85 rounded-xl px-3 py-2 shadow-soft';
-      li.textContent = t;
-      document.querySelector('#promiseHimList').appendChild(li);
-    });
-    (s.promiseHer||[]).forEach(t => {
-      const li = document.createElement('li');
-      li.className = 'bg-white/85 rounded-xl px-3 py-2 shadow-soft';
-      li.textContent = t;
-      document.querySelector('#promiseHerList').appendChild(li);
-    });
-    (s.timeline||[]).forEach(x => {
-      const li = document.createElement('li');
-      li.className = 'ms-2';
-      li.innerHTML = `<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div>
-        <time class="text-sm text-slate-500">${x.date}</time>
-        <h4 class="font-semibold">${x.title}</h4>
-        <p class="text-slate-700">${x.note||''}</p>`;
-      document.querySelector('#timelineList').appendChild(li);
-    });
-    if(s.musicUrl){ document.querySelector('#musicUrl').value=s.musicUrl; }
-    if(Array.isArray(s.slideImages) && s.slideImages.length){
-      // render album + slideshow luôn
-      const grid = document.querySelector('#albumGrid'); grid.innerHTML='';
-      s.slideImages.forEach((url,i)=>{
-        const f=document.createElement('figure');
-        f.className='relative bg-white rounded-xl p-2 pt-3 shadow-soft';
-        f.innerHTML=`<img src="${url}" class="w-full h-36 object-cover rounded-lg select-none"/>
-                     <figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`;
-        grid.appendChild(f);
-      });
-    }
-  }catch(e){}
-})();
+   const url = 'https://tranha1.github.io/happy-20-10/data/content.json';
+   try{
+     const res = await fetch(url, {cache: 'no-store'});
+     if(!res.ok) return;
+     const s = await res.json();
+     // đổ dữ liệu vào giao diện
+     if(s.startLove) document.querySelector('#startLove').value = s.startLove;
+     (s.wishes||[]).forEach(t => {
+       const li = document.createElement('li');
+       li.className = 'bg-white/85 rounded-2xl p-3 shadow-soft flex items-start gap-3';
+       li.innerHTML = `<span>✨</span><span class="break-words">${t}</span>`;
+       document.querySelector('#wishList').appendChild(li);
+     });
+     (s.promiseHim||[]).forEach(t => {
+       const li = document.createElement('li');
+       li.className = 'bg-white/85 rounded-xl px-3 py-2 shadow-soft';
+       li.textContent = t;
+       document.querySelector('#promiseHimList').appendChild(li);
+     });
+     (s.promiseHer||[]).forEach(t => {
+       const li = document.createElement('li');
+       li.className = 'bg-white/85 rounded-xl px-3 py-2 shadow-soft';
+       li.textContent = t;
+       document.querySelector('#promiseHerList').appendChild(li);
+     });
+     (s.timeline||[]).forEach(x => {
+       const li = document.createElement('li');
+       li.className = 'ms-2';
+       li.innerHTML = `<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div>
+         <time class="text-sm text-slate-500">${x.date}</time>
+         <h4 class="font-semibold">${x.title}</h4>
+         <p class="text-slate-700">${x.note||''}</p>`;
+       document.querySelector('#timelineList').appendChild(li);
+     });
+     if(s.musicUrl){ document.querySelector('#musicUrl').value=s.musicUrl; }
+     if(Array.isArray(s.slideImages) && s.slideImages.length){
+       // render album + slideshow luôn (resolve relative urls)
+       const grid = document.querySelector('#albumGrid'); grid.innerHTML='';
+       s.slideImages.forEach((url,i)=>{
+         const f=document.createElement('figure');
+         f.className='relative bg-white rounded-xl p-2 pt-3 shadow-soft';
+         f.innerHTML=`<img src="${resolveUrl(url)}" class="w-full h-36 object-cover rounded-lg select-none"/>
+                      <figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`;
+         grid.appendChild(f);
+       });
+     }
+   }catch(e){}
+ })();
 
     function escapeHtml(str){ return str.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;'); }
   </script>
