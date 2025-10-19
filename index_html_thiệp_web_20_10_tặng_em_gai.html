@@ -1,120 +1,803 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <title>🌸 Thiệp 20/10 tặng Em Gái</title>
-  <meta name="description" content="Thiệp web vui nhộn chúc mừng 20/10 dành cho em gái" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&family=Pacifico&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#fce7f3" />
+  <title>20/10 – Yêu Em (Liquid Glass)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ["SF Pro Display","Poppins","ui-sans-serif","system-ui","-apple-system"],
+            body: ["SF Pro Text","Inter","ui-sans-serif","system-ui","-apple-system"],
+          },
+          colors: { roseglass: "#fce7f3", glass: "rgba(255,255,255,.6)" },
+          boxShadow: { soft: "0 10px 30px rgba(0,0,0,.10)", glow: "0 0 0 8px rgba(244,63,94,.12)", focus: "0 0 0 10px rgba(244,63,94,.16)" },
+          keyframes: {
+            fadeIn: { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
+            slideUp: { '0%': { transform: 'translateY(18px)', opacity: 0 }, '100%': { transform: 'translateY(0)', opacity: 1 } },
+            pageIn: { '0%': { opacity:.0, transform:'scale(.985) translateY(8px)' }, '100%': { opacity:1, transform:'none' }},
+            pageOut: { '0%': { opacity:1, transform:'none' }, '100%': { opacity:.0, transform:'scale(.985) translateY(8px)' }},
+          },
+          animation: { fadeIn: "fadeIn .5s ease both", slideUp: "slideUp .45s ease both", pageIn: "pageIn .35s ease both", pageOut: "pageOut .28s ease both" }
+        }
+      }
+    }
+  </script>
   <style>
-    body{margin:0;font-family:Poppins,sans-serif;background:linear-gradient(135deg,#ffeaf3,#e6e6ff);color:#333;overflow-x:hidden;text-align:center}
-    .glass{background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:16px;padding:20px;margin:20px auto;max-width:800px;box-shadow:0 8px 20px rgba(0,0,0,.1)}
-    header{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;position:sticky;top:0;background:rgba(255,255,255,.6);backdrop-filter:blur(8px)}
-    h1{font-family:Pacifico,cursive;color:#ff2f7a;margin:0;font-size:22px}
-    button{border:none;border-radius:10px;padding:10px 16px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,#ff5c9a,#7a5cff);color:#fff;box-shadow:0 5px 10px rgba(0,0,0,.1)}
-    button:hover{opacity:.9}
-    .envelope{position:relative;width:300px;height:200px;margin:30px auto;cursor:pointer;}
-    .env-body{position:absolute;inset:0;background:#fff;border-radius:10px;box-shadow:0 5px 15px rgba(0,0,0,.2)}
-    .env-flap{position:absolute;inset:0;clip-path:polygon(0 0,100% 0,50% 60%);background:linear-gradient(180deg,#fff 0%,#ffe3ef 80%);transform-origin:50% 0;transition:transform .6s}
-    .envelope.open .env-flap{transform:rotateX(180deg)}
-    .letter{max-height:0;overflow:hidden;transition:max-height 1s ease}
-    .letter.open{max-height:600px}
-    .paper{background:#fff;border-radius:10px;padding:20px;box-shadow:0 5px 10px rgba(0,0,0,.1);margin:10px auto;max-width:500px}
-    .typed{white-space:pre-wrap;min-height:60px}
-    .fun-section{display:grid;gap:16px;grid-template-columns:1fr;max-width:800px;margin:0 auto;padding:20px}
-    .widget{background:rgba(255,255,255,.6);backdrop-filter:blur(8px);border-radius:12px;padding:20px;box-shadow:0 5px 10px rgba(0,0,0,.1)}
-    .kudos{display:flex;align-items:center;justify-content:center;gap:12px}
-    .kudos .count{font-size:30px;font-weight:700;color:#ff2f7a}
-    .game{margin-top:20px}
-    .balloon{font-size:40px;cursor:pointer;animation:float 3s ease-in-out infinite}
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-    footer{text-align:center;font-size:12px;color:#666;margin:40px 0}
+    :root{ --glass-border: rgba(244,63,94,.22); --glass-bg-1: rgba(255,255,255,.52); --glass-bg-2: rgba(255,240,246,.38); --accent:#f43f5e; }
+    html, body {height:100%; overflow:hidden;}
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:-9999;
+      background: url('background.jpg') center/cover no-repeat;
+      background-attachment: fixed;
+    }
+
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:-9998;
+      pointer-events:none;
+      backdrop-filter: blur(9px) saturate(140%);
+      -webkit-backdrop-filter: blur(9px) saturate(140%);
+      background:
+        radial-gradient(1000px 600px at 10% 10%, rgba(254,205,211,.22), transparent 60%),
+        radial-gradient(900px 540px at 90% 20%, rgba(219,234,254,.18), transparent 60%),
+        radial-gradient(1000px 600px at 50% 95%, rgba(233,213,255,.16), transparent 60%);
+    }
+    .glass{ background: linear-gradient( to bottom right, var(--glass-bg-1), var(--glass-bg-2) ); backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%); border:1px solid var(--glass-border); box-shadow:0 8px 32px rgba(0,0,0,.10); }
+    .btn{ background:var(--accent); color:#fff; border-radius:1rem; padding:.6rem 1rem; font-weight:600; }
+    .btn:hover{ box-shadow:0 0 0 8px rgba(244,63,94,.12); transform:translateY(-1px); }
+    .page{ display:none; height:100vh; width:100vw; align-items:center; justify-content:center; padding-top:4.5rem; }
+    .page.active{ display:flex; animation: pageIn; }
+    .page.leaving{ display:flex; animation: pageOut; }
+    .widget{ border-radius:1.25rem; transition:transform .25s ease, box-shadow .25s ease; }
+    .widget:hover{ transform: translateY(-2px); box-shadow:0 16px 40px rgba(0,0,0,.12), 0 0 0 8px rgba(244,63,94,.08); }
+    .stat-value{ font-variation-settings:"wght" 700; }
+    .overlay{ background: linear-gradient( to top, rgba(0,0,0,.35), rgba(0,0,0,.0) ); }
+    @media (max-width:480px){ .btn{ padding:.55rem .9rem; } }
+
+     /* ===== CSS Icons for Sidebar (pure CSS) ===== */
+    .ico{ --s:24px; width:var(--s); height:var(--s); position:relative; display:inline-block; }
+    .ico::before, .ico::after{ content:""; position:absolute; inset:0; margin:auto; }
+    .ico-home{ border:2px solid rgba(255,255,255,.9); border-bottom:none; transform: rotate(45deg); width:18px; height:18px; top:2px; }
+    .ico-home::after{ content:""; position:absolute; left:50%; transform:translate(-50%,60%) rotate(-45deg); width:12px; height:10px; background:rgba(255,255,255,.9); border-radius:3px; }
+    .ico-clock{ border:2px solid rgba(255,255,255,.9); border-radius:50%; }
+    .ico-clock::after{ width:10px; height:2px; background:rgba(255,255,255,.9); left:50%; top:50%; transform:translate(-10%, -50%); box-shadow:-4px -4px 0 0 rgba(255,255,255,.9); }
+    .ico-flower{ width:0; height:0; }
+    .ico-flower::before{ width:6px; height:6px; background:#fff; border-radius:50%; box-shadow:0 -10px 0 2px rgba(255,255,255,.7), 10px 0 0 2px rgba(255,255,255,.7), 0 10px 0 2px rgba(255,255,255,.7), -10px 0 0 2px rgba(255,255,255,.7); }
+    .ico-dash{ width:16px; height:12px; border:2px solid rgba(255,255,255,.9); border-radius:6px; }
+    .ico-dash::after{ width:10px; height:2px; background:rgba(255,255,255,.9); top:3px; left:3px; box-shadow:0 4px 0 0 rgba(255,255,255,.9), 0 8px 0 0 rgba(255,255,255,.9); }
+    .ico-route{ width:18px; height:18px; border-radius:50%; box-shadow: inset 0 0 0 2px rgba(255,255,255,.9); }
+    .ico-route::after{ width:2px; height:10px; background:rgba(255,255,255,.9); left:50%; transform:translateX(-50%); top:4px; border-radius:1px; }
+
+    /* Sidebar buttons look */
+    .sidebtn{ width:44px; height:44px; display:grid; place-items:center; border-radius:14px; background:linear-gradient(to bottom right, rgba(255,255,255,.35), rgba(255,192,203,.25)); border:1px solid rgba(255,255,255,.5); backdrop-filter: blur(16px) saturate(150%); -webkit-backdrop-filter: blur(16px) saturate(150%); color:white; }
+    .sidebtn:hover{ box-shadow:0 10px 24px rgba(0,0,0,.18), 0 0 0 6px rgba(244,63,94,.12); }
+
+    /* Gate slideshow */
+    .gate-img{ position:absolute; width:72%; height:72%; object-fit:cover; border-radius:1.25rem; box-shadow:0 20px 50px rgba(0,0,0,.18); transition: transform .6s ease, filter .6s ease, opacity .6s ease; }
+    .gate-main{ z-index:2; transform: translateX(0) scale(1); filter: blur(0) saturate(110%); opacity:1; }
+    .gate-side{ z-index:1; width:56%; height:56%; filter: blur(3px) saturate(90%); opacity:.65; }
+    .gate-side.left{ transform: translateX(-36%) scale(.9); }
+    .gate-side.right{ transform: translateX(36%) scale(.9); }
+    .dot{ width:8px; height:8px; border-radius:9999px; background:rgba(255,255,255,.55); border:1px solid rgba(255,255,255,.8); }
+    .dot.active{ background:#fff; box-shadow:0 0 0 4px rgba(244,63,94,.18); }
+    /* [SWIPE] cursor states for gate slideshow */
+    #gateShow{ cursor: grab; }
+    #gateShow.grabbing{ cursor: grabbing; }
+    @media (max-width:480px){ .btn{ padding:.55rem .9rem; } .sidebtn{ width:40px; height:40px; } }
   </style>
 </head>
-<body>
-<header>
-  <h1>Thiệp 20/10 cho Em Gái 💕</h1>
-  <div>
-    <button id="toggleMusic">🎵 Bật nhạc</button>
-    <button id="spawnConfetti">✨ Bắn tim</button>
-  </div>
-</header>
+<body class="font-body text-slate-800 selection:bg-rose-200/70">
+  <!-- Top bar: kính mờ, bỏ các nút trang -->
+  <header id="topnav" class="fixed top-0 left-0 right-0 z-30">
+    <nav class="mx-auto max-w-7xl px-4 py-3">
+      <div class="glass rounded-2xl px-4 py-3 flex items-center justify-between">
+        <h1 class="font-display text-lg md:text-2xl font-extrabold tracking-tight select-none">Cho mọi ngày của chúng ta</h1>
+        <div class="text-sm text-slate-700 opacity-80">Hạ và Ngọc Anh</div>
+      </div>
+    </nav>
+  </header>
 
-<section class="glass">
-  <h2>Gửi em gái yêu dấu 🌸</h2>
-  <p>Nhấn vào phong bì để mở thư bí mật nhé!</p>
-  <div class="envelope" id="envelope">
-    <div class="env-body"></div>
-    <div class="env-flap"></div>
-  </div>
-  <div id="letter" class="letter">
-    <div class="paper">
-      <h3>Thư gửi em Hằng</h3>
-      <div id="typed" class="typed"></div>
-      <div>
-        <button id="retype">↻ Gõ lại</button>
-        <button id="editMsg">✍️ Sửa lời chúc</button>
+  <!-- Sidebar điều hướng (icons CSS) -->
+  <aside class="fixed left-3 top-24 z-30">
+    <div class="glass rounded-2xl p-2 flex flex-col gap-2">
+      <button class="sidebtn" title="Home" data-goto="gate"><span class="ico ico-home"></span></button>
+      <button class="sidebtn" title="Đếm ngược" data-goto="countdown"><span class="ico ico-clock"></span></button>
+      <button class="sidebtn" title="Intro" data-goto="intro"><span class="ico ico-flower"></span></button>
+      <button class="sidebtn" title="Nội dung" data-goto="content"><span class="ico ico-dash"></span></button>
+      <button class="sidebtn" title="Timeline" data-goto="timeline"><span class="ico ico-route"></span></button>
+    </div>
+  </aside>
+
+<!-- PAGE: Gate – Trình chiếu ảnh focus ở giữa, ảnh sau bị mờ -->
+  <section id="page-gate" class="page active">
+    <div class="relative w-[92vw] md:w-[78vw] h-[70vh] rounded-3xl overflow-hidden glass">
+      <div id="gateShow" class="absolute inset-0 grid place-items-center">
+        <img id="gatePrev" class="gate-img gate-side left" alt="prev"/>
+        <img id="gateCurr" class="gate-img gate-main" alt="current"/>
+        <img id="gateNext" class="gate-img gate-side right" alt="next"/>
+      </div>
+      <div class="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-1.5" id="gateDots"></div>
+    </div>
+  </section>
+
+  <section id="page-countdown" class="page">
+    <div class="glass rounded-3xl p-6 md:p-10 shadow-soft text-center max-w-lg animate-slideUp">
+      <h2 class="font-display text-3xl font-bold mb-3">⏳ Đếm ngược 20/10</h2>
+      <p class="text-slate-700">Thời khắc dành tặng em yêu</p>
+      <div class="text-5xl font-display mt-4" id="countText">-- ngày : -- giờ : -- phút : -- giây</div>
+    </div>
+  </section>
+
+  <section id="page-intro" class="page">
+    <div class="glass rounded-3xl p-6 md:p-10 text-center max-w-xl animate-slideUp">
+      <h2 class="font-display text-3xl font-bold mb-3">🌸 Lời mở đầu cho 20/10</h2>
+      <p class="text-slate-800">Anh muốn dành tặng em mọi điều ngọt ngào. Cảm ơn em đã luôn bên anh 💖</p>
+    </div>
+  </section>
+
+  <!-- CONTENT (dashboard) – scrollable -->
+    <section id="page-content" class="page overflow-y-auto pb-20">
+    <div class="w-full max-w-7xl mx-auto px-6">
+      <!-- Stat tiles -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 pt-4">
+        <div class="widget glass p-4"><p class="text-xs text-slate-600">Ngày bên nhau</p><div class="stat-value text-2xl md:text-3xl" id="stat-days">—</div></div>
+        <div class="widget glass p-4"><p class="text-xs text-slate-600">Điều ước</p><div class="stat-value text-2xl md:text-3xl" id="stat-wishes">0</div></div>
+        <div class="widget glass p-4"><p class="text-xs text-slate-600">Lời hứa</p><div class="stat-value text-2xl md:text-3xl" id="stat-promises">0</div></div>
+        <div class="widget glass p-4"><p class="text-xs text-slate-600">Mốc timeline</p><div class="stat-value text-2xl md:text-3xl" id="stat-timeline">2</div></div>
+      </div>
+
+      <!-- 12-col layout cho kích thước chính xác -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-5 mt-4">
+        <!-- Letter -->
+        <div class="md:col-span-8 widget glass p-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display text-xl font-bold">💌 Thư chúc mừng</h3>
+            <div class="flex gap-2">
+              <button id="openLetterBtn" class="px-3 py-2 rounded-xl bg-rose-500 text-white hover:shadow-glow">Mở thư</button>
+              <button id="saveAll" class="px-3 py-2 rounded-xl bg-white">💾 Lưu</button>
+              <button id="exportJson" class="px-3 py-2 rounded-xl bg-white">⬇️ Export</button>
+              <label class="px-3 py-2 rounded-xl bg-white cursor-pointer">⬆️ Import<input id="importJson" type="file" accept="application/json" class="hidden"></label>
+            </div>
+          </div>
+          <div id="envelope" class="mt-3 relative h-36 rounded-xl overflow-hidden bg-gradient-to-br from-rose-200 to-pink-200 border border-white/60 shadow-soft flex items-center justify-center"><span class="font-display">(Bấm "Mở thư") ✨</span></div>
+          <article id="letter" class="mt-3 hidden opacity-0"><div class="rounded-xl bg-white/85 p-4 border border-rose-200 shadow-soft transform transition-transform"><h4 class="font-display text-lg md:text-xl mb-2">Gửi em yêu,</h4><p id="typeHost" class="leading-7 md:leading-8"></p><p class="mt-3">— Anh</p></div></article>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="md:col-span-4 widget glass p-4">
+          <h3 class="font-display text-xl font-bold">⚡ Quick actions</h3>
+          <div class="mt-3 space-y-2">
+            <label class="block text-sm">Ngày bắt đầu yêu<input id="startLove" type="date" class="mt-1 w-full glass rounded-xl px-3 py-2"/></label>
+            <button id="calcDays" class="w-full btn">Cập nhật ngày bên nhau</button>
+          </div>
+        </div>
+
+        <!-- Music & Slideshow: cùng kích thước với Album (col-span-8) -->
+        <div class="md:col-span-8 widget glass p-4">
+          <h3 class="font-display text-xl font-bold">🎵 Nhạc & Slideshow</h3>
+          <div id="slideshowBox" class="relative rounded-2xl overflow-hidden mt-2">
+            <img id="slideImage" class="w-full h-56 md:h-64 object-cover select-none" alt="slideshow"/>
+            <div class="overlay absolute inset-x-0 bottom-0 p-3 text-white text-sm">Đang phát: <span id="nowTitle">—</span></div>
+          </div>
+
+          <!-- Search UI (thay cho ô URL) -->
+          <div class="mt-3 flex flex-wrap gap-2 items-center">
+            <input id="ytSearch" class="glass rounded-xl px-3 py-2 grow min-w-[220px]" placeholder="Tìm video trên YouTube..." />
+            <button id="searchYT" class="btn">Tìm</button>
+
+            <!-- Optional: bật input API key nếu muốn dùng YouTube Data API để thấy thumbnail + kết quả -->
+            <div class="relative ml-2">
+              <button id="toggleApi" class="px-3 py-2 rounded-xl bg-white">Cài API</button>
+              <div id="apiBox" class="hidden absolute top-full mt-2 right-0 w-80 glass rounded-xl p-2 shadow-soft">
+          <label class="text-xs text-slate-600">API Key (tùy chọn để hiển thị kết quả trực tiếp)</label>
+          <input id="ytApiKey" class="mt-1 w-full glass rounded-xl px-3 py-2" placeholder="Nhập YouTube Data API key (không bắt buộc)"/>
+          <div class="text-xs text-slate-500 mt-1">Nếu không có API key, nút Tìm sẽ mở kết quả tìm kiếm YouTube trong tab mới.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kết quả tìm kiếm -->
+          <div id="ytResults" class="mt-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+
+          <!-- hidden input để giữ musicUrl (giữ tương thích với phần save/load) -->
+          <input id="musicUrl" type="hidden" value=""/>
+
+          <div id="musicFrameWrap" class="mt-3 rounded-xl overflow-hidden">
+            <iframe id="musicFrame" class="w-full h-44 md:h-56" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" loading="lazy"></iframe>
+          </div>
+        </div>
+
+        <script>
+        (function(){
+          const $ = (s, r=document) => r.querySelector(s);
+          const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+          const searchInput = $('#ytSearch');
+          const searchBtn = $('#searchYT');
+          const resultsWrap = $('#ytResults');
+          const apiToggle = $('#toggleApi');
+          const apiBox = $('#apiBox');
+          const apiKeyInput = $('#ytApiKey');
+          const iframe = $('#musicFrame');
+          const nowTitle = $('#nowTitle');
+          const hiddenUrl = $('#musicUrl');
+
+          function playVideoById(id, title){
+            const embed = 'https://www.youtube.com/embed/' + id + '?autoplay=1&rel=0';
+            iframe.src = embed;
+            nowTitle.textContent = title || 'YouTube';
+            hiddenUrl.value = 'https://www.youtube.com/watch?v=' + id;
+            try{ if(typeof saveState === 'function') saveState(); }catch(e){}
+          }
+
+          function renderResults(items){
+            resultsWrap.innerHTML = '';
+            if(!items || items.length===0){
+              resultsWrap.innerHTML = '<div class="text-sm text-slate-500 col-span-full">Không tìm thấy kết quả.</div>';
+              return;
+            }
+            items.forEach(it=>{
+              const vid = it.id.videoId;
+              const snip = it.snippet || {};
+              const thumb = (snip.thumbnails && (snip.thumbnails.medium || snip.thumbnails.default)) ? (snip.thumbnails.medium.url || snip.thumbnails.default.url) : '';
+              const title = snip.title || 'Video';
+              const el = document.createElement('button');
+              el.className = 'bg-white/90 rounded-xl overflow-hidden text-left p-0 shadow-soft';
+              el.innerHTML = `
+          <img src="${thumb}" class="w-full h-28 object-cover" alt="${title}" />
+          <div class="p-2 text-xs"><div class="font-medium mb-1">${title}</div><div class="text-xxs text-slate-500">${snip.channelTitle || ''}</div></div>
+              `;
+              el.addEventListener('click', ()=> playVideoById(vid, title));
+              resultsWrap.appendChild(el);
+            });
+          }
+
+          async function searchYouTube(query){
+            const key = apiKeyInput.value.trim();
+            if(!query) return;
+            if(key){
+              try{
+          resultsWrap.innerHTML = '<div class="col-span-full text-sm text-slate-500">Đang tìm...</div>';
+          const url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=12&q=' + encodeURIComponent(query) + '&key=' + encodeURIComponent(key);
+          const res = await fetch(url);
+          if(!res.ok) throw new Error('API lỗi');
+          const data = await res.json();
+          renderResults(data.items || []);
+              }catch(err){
+          resultsWrap.innerHTML = `<div class="col-span-full text-sm text-rose-600">Lỗi tìm kiếm API. Mở kết quả trên YouTube.</div>`;
+          window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(query), '_blank');
+              }
+            } else {
+              // fallback: mở trang kết quả YouTube trong tab mới
+              window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(query), '_blank');
+            }
+          }
+
+          // toggle API box
+          apiToggle.addEventListener('click', ()=> apiBox.classList.toggle('hidden'));
+
+          // search handlers
+          searchBtn.addEventListener('click', ()=> searchYouTube(searchInput.value.trim()));
+          searchInput.addEventListener('keydown', (e)=> { if(e.key === 'Enter') { e.preventDefault(); searchYouTube(searchInput.value.trim()); } });
+
+          // If user clicks a thumbnail result and we want to also keep compatibility with existing play button,
+          // we update hidden musicUrl and call saveState above. Existing code's play button still exists but URL box is hidden.
+          // Restore previous saved video on load (if any) - attempt to play if musicUrl already set in localStorage later by main loadState.
+          // No extra actions needed here on load.
+
+        })();
+        </script>
+
+        <!-- Wishes: nhỏ bằng một nửa (col-span-4) và có nút thêm riêng -->
+        <div class="md:col-span-4 widget glass p-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display text-xl font-bold">🪄 Điều ước</h3>
+            <div class="flex gap-2"><input id="wishText2" class="glass rounded-xl px-3 py-2" placeholder="Điều ước..."/><button id="addWish2" class="px-3 py-2 rounded-xl bg-rose-500 text-white">+</button></div>
+          </div>
+          <ul id="wishList" class="mt-3 grid sm:grid-cols-1 gap-3"></ul>
+        </div>
+
+        <!-- Promises: rộng gấp đôi (col-span-8) và cao tương tự slideshow -->
+        <div class="md:col-span-8 widget glass p-4">
+          <h3 class="font-display text-xl font-bold">🤝 Lời hứa (Anh & Em)</h3>
+          <div class="grid md:grid-cols-2 gap-3 mt-2">
+            <div>
+              <p class="text-xs font-semibold text-slate-600">Của anh</p>
+              <div class="flex gap-2 mt-1"><input id="promiseHimText" class="glass rounded-xl px-3 py-2 grow" placeholder="Anh hứa..."/><button id="addPromiseHim" class="px-3 py-2 rounded-xl bg-rose-500 text-white">+</button></div>
+              <ul id="promiseHimList" class="mt-2 space-y-2"></ul>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-slate-600">Của em</p>
+              <div class="flex gap-2 mt-1"><input id="promiseHerText" class="glass rounded-xl px-3 py-2 grow" placeholder="Em hứa..."/><button id="addPromiseHer" class="px-3 py-2 rounded-xl bg-rose-500 text-white">+</button></div>
+              <ul id="promiseHerList" class="mt-2 space-y-2"></ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Album: cùng kích thước với Music (col-span-8) -->
+        <div class="md:col-span-8 widget glass p-4">
+          <div class="flex items-center justify-between"><h3 class="font-display text-xl font-bold">📷 Album kỉ niệm</h3><label class="px-3 py-2 rounded-xl bg-white hover:shadow-glow cursor-pointer"><input type="file" id="photoInput" accept="image/*" multiple class="hidden">Thêm ảnh</label></div>
+          <p class="text-sm text-slate-600 mt-1">Ảnh sẽ tự đổi mỗi <span id="slideSec">4</span>s ở ô Nhạc & Slideshow.</p>
+          <div id="albumGrid" class="mt-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+        </div>
+
+        <!-- Timeline full width -->
+        <div class="md:col-span-12 widget glass p-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display text-xl font-bold">🗺️ Timeline</h3>
+            <div class="flex gap-2">
+              <input id="tlDate" type="date" class="glass rounded-xl px-3 py-2"/>
+              <input id="tlTitle" type="text" class="glass rounded-xl px-3 py-2" placeholder="Hoạt động"/>
+              <input id="tlNote" type="text" class="glass rounded-xl px-3 py-2" placeholder="Ghi chú"/>
+              <button id="addTL" class="btn">Thêm</button>
+            </div>
+          </div>
+
+          <ol id="timelineList" class="relative mt-4 border-s-2 border-rose-200 ps-4 space-y-4">
+            <li class="ms-2 relative">
+              <button type="button" class="delete-tl absolute end-0 -top-1 text-xs px-2 py-1 rounded bg-white/90 hover:bg-rose-50">🗑️</button>
+              <div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div>
+              <time class="text-sm text-slate-500">2025-10-20</time>
+              <h4 class="font-semibold">Cà phê mở màn</h4>
+              <p class="text-slate-700">Góc quen thuộc, 2 ly capuchino.</p>
+            </li>
+            <li class="ms-2 relative">
+              <button type="button" class="delete-tl absolute end-0 -top-1 text-xs px-2 py-1 rounded bg-white/90 hover:bg-rose-50">🗑️</button>
+              <div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div>
+              <time class="text-sm text-slate-500">2025-10-20</time>
+              <h4 class="font-semibold">Dạo phố & ăn trưa</h4>
+              <p class="text-slate-700">Điểm check-in xinh xắn.</p>
+            </li>
+          </ol>
+        </div>
+
+        <script>
+        (function(){
+          function esc(s){ return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;'); }
+
+          const list = document.getElementById('timelineList');
+
+          // Delegated delete handler for existing and future items
+          list.addEventListener('click', function(e){
+            const btn = e.target.closest('.delete-tl');
+            if(!btn) return;
+            const li = btn.closest('li');
+            if(li) li.remove();
+            const st = document.getElementById('stat-timeline');
+            if(st) st.textContent = list.querySelectorAll('li').length;
+            if(typeof saveState === 'function') try{ saveState(); }catch(e){}
+          });
+
+          // Replace addTL button after DOM ready to ensure we remove any previously attached handlers
+          document.addEventListener('DOMContentLoaded', function(){
+            const old = document.getElementById('addTL');
+            if(!old) return;
+            const btn = old.cloneNode(true);
+            old.parentNode.replaceChild(btn, old);
+
+            btn.addEventListener('click', function(){
+              const d = document.getElementById('tlDate').value || new Date().toISOString().slice(0,10);
+              const t = (document.getElementById('tlTitle').value || '').trim();
+              const n = (document.getElementById('tlNote').value || '').trim();
+              if(!t) return;
+              const li = document.createElement('li');
+              li.className = 'ms-2 relative';
+              li.innerHTML = [
+          '<button type="button" class="delete-tl absolute end-0 -top-1 text-xs px-2 py-1 rounded bg-white/90 hover:bg-rose-50">🗑️</button>',
+          '<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div>',
+          `<time class="text-sm text-slate-500">${esc(d)}</time>`,
+          `<h4 class="font-semibold">${esc(t)}</h4>`,
+          `<p class="text-slate-700">${esc(n)}</p>`
+              ].join('');
+              list.appendChild(li);
+
+              // clear inputs
+              document.getElementById('tlTitle').value = '';
+              document.getElementById('tlNote').value = '';
+
+              const st = document.getElementById('stat-timeline');
+              if(st) st.textContent = list.querySelectorAll('li').length;
+              if(typeof saveState === 'function') try{ saveState(); }catch(e){}
+            });
+          });
+        })();
+        </script>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section class="fun-section">
-  <div class="widget">
-    <h4> Máy đếm tiền</h4>
-    <div class="kudos">
-      <div class="count" id="kudosCount">0</div>
-      <button id="kudosBtn">+1 Tuyệt vời!</button>
-      <button id="kudosReset">Đặt lại</button>
+  <section id="page-timeline" class="page">
+    <div class="glass rounded-3xl p-6 md:p-10 shadow-soft max-w-4xl animate-slideUp">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-display text-2xl font-bold">📅 Kế hoạch tổng quan</h2>
+        <div class="text-sm text-slate-600">Quản lý: thêm • sửa • xóa — đồng bộ với trang Timeline</div>
+      </div>
+
+      <!-- Form thêm kế hoạch -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-4">
+        <input id="tlDate2" type="date" class="glass rounded-xl px-3 py-2 md:col-span-1" />
+        <input id="tlTitle2" type="text" class="glass rounded-xl px-3 py-2 md:col-span-2" placeholder="Hoạt động (ví dụ: Cà phê sáng)" />
+        <input id="tlNote2" type="text" class="glass rounded-xl px-3 py-2 md:col-span-3" placeholder="Ghi chú (ví dụ: Góc quen thuộc)" />
+        <button id="addTL2" class="btn md:col-span-1">Thêm</button>
+      </div>
+
+      <!-- Danh sách chỉnh sửa nhanh (editor) -->
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <h3 class="font-semibold mb-2">Danh sách (chỉnh sửa nhanh)</h3>
+          <div id="timelineEditorList" class="space-y-3"></div>
+        </div>
+
+        <div>
+          <h3 class="font-semibold mb-2">Xem trên trang Timeline</h3>
+          <p class="text-sm text-slate-600 mb-2">Các thay đổi ở đây sẽ được ghi vào danh sách chính ở trang Nội dung (Timeline chung) và lưu vào bộ nhớ.</p>
+          <div class="glass rounded-xl p-3 max-h-80 overflow-auto">
+            <!-- We will mirror the real timelineList (the one in the content page) -->
+            <ol id="timelinePreview" class="space-y-3"></ol>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="widget">
-    <h4>🎈 Trò chơi thả bóng bay</h4>
-    <p>Nhấn vào bóng bay để làm nó nổ và nhận lời chúc vui nhé!</p>
-    <div id="balloonArea" class="game"></div>
-  </div>
-</section>
 
-<section class="glass">
-  <h4>📝 Lời nhắn viết tay</h4>
-  <input id="noteInput" type="text" placeholder="Viết thêm lời nhắn…">
-  <button id="addNote">Thêm vào thư</button>
-</section>
+    <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      // helpers
+      const mainList = document.getElementById('timelineList'); // existing main list in content page
+      const editorList = document.getElementById('timelineEditorList');
+      const preview = document.getElementById('timelinePreview');
+      const dateIn = document.getElementById('tlDate2');
+      const titleIn = document.getElementById('tlTitle2');
+      const noteIn = document.getElementById('tlNote2');
+      const addBtn = document.getElementById('addTL2');
 
-<footer>
-  Làm bằng 💗 để chúc mừng em gái nhân ngày 20/10 · Đặt file <code>music.mp3</code> cạnh tệp này để phát nhạc nền.
-</footer>
+      function ensureIds(){
+        Array.from(mainList.children).forEach((li,i)=>{
+          if(!li.dataset.tlid) li.dataset.tlid = 'tl_' + (Date.now().toString(36)) + '_' + i;
+        });
+      }
 
-<audio id="bgm" loop preload="auto"><source src="music.mp3" type="audio/mpeg"></audio>
-<script>
-const envelope=document.getElementById('envelope');const letter=document.getElementById('letter');const typed=document.getElementById('typed');const retype=document.getElementById('retype');const editMsg=document.getElementById('editMsg');const kudosBtn=document.getElementById('kudosBtn');const kudosReset=document.getElementById('kudosReset');const kudosCount=document.getElementById('kudosCount');const noteInput=document.getElementById('noteInput');const addNote=document.getElementById('addNote');const bgm=document.getElementById('bgm');const toggleMusic=document.getElementById('toggleMusic');const spawnConfetti=document.getElementById('spawnConfetti');
-let baseMsg=`Chúc mừng 20/10! 💕\n\nChúc em gái luôn xinh đẹp, học giỏi, vui vẻ và hạnh phúc mỗi ngày!\n\nHôm nay nhớ ăn ngon, cười tươi và nhận thật nhiều hoa nhé! 🌸💝`;
-let typingTimer;
-function typewriter(text){clearInterval(typingTimer);typed.textContent='';let i=0;typingTimer=setInterval(()=>{typed.textContent+=text[i]||'';i++;if(i>=text.length)clearInterval(typingTimer);},25);}
+      function buildEditor(){
+        ensureIds();
+        editorList.innerHTML = '';
+        preview.innerHTML = '';
+        Array.from(mainList.children).forEach((mli)=>{
+          const id = mli.dataset.tlid;
+          const dateEl = mli.querySelector('time');
+          const h = mli.querySelector('h4');
+          const p = mli.querySelector('p');
+          const d = dateEl ? dateEl.textContent : '';
+          const t = h ? h.textContent : '';
+          const n = p ? p.textContent : '';
 
-// Envelope open
-envelope.addEventListener('click',()=>{envelope.classList.toggle('open');const isOpen=envelope.classList.contains('open');letter.classList.toggle('open',isOpen);if(isOpen)typewriter(baseMsg);});
-retype.addEventListener('click',()=>typewriter(baseMsg));
-editMsg.addEventListener('click',()=>{const val=prompt('Nhập lời chúc của bạn:',baseMsg);if(val&&val.trim().length>3){baseMsg=val.trim();typewriter(baseMsg);}});
+          // Editor item
+          const item = document.createElement('div');
+          item.className = 'bg-white/90 rounded-xl p-3 flex items-start justify-between shadow-sm';
+          item.dataset.tlid = id;
+          item.innerHTML = `
+            <div class="flex-1 min-w-0">
+              <div class="text-sm text-slate-500 mb-1">${d || '—'}</div>
+              <div class="font-medium">${t || '—'}</div>
+              <div class="text-xs text-slate-600 mt-1">${n || ''}</div>
+            </div>
+            <div class="flex items-center gap-2 ml-3">
+              <button class="edit-tl px-2 py-1 rounded bg-white text-sm">Sửa</button>
+              <button class="del-tl px-2 py-1 rounded bg-rose-100 text-sm">Xóa</button>
+            </div>
+          `;
+          editorList.appendChild(item);
 
-// Kudos counter
-const KKEY='kudos-emgai';function loadKudos(){const v=+localStorage.getItem(KKEY)||0;kudosCount.textContent=v;}function saveKudos(v){localStorage.setItem(KKEY,v);}loadKudos();
-kudosBtn.addEventListener('click',()=>{let v=+kudosCount.textContent+1;kudosCount.textContent=v;saveKudos(v);sparkle();});
-kudosReset.addEventListener('click',()=>{saveKudos(0);loadKudos();});
+          // Preview item (read-only)
+          const pItem = document.createElement('li');
+          pItem.className = 'ms-2 relative bg-white/80 rounded p-2';
+          pItem.innerHTML = `<time class="text-sm text-slate-500">${d || '—'}</time><h4 class="font-semibold">${t||'—'}</h4><p class="text-slate-700">${n||''}</p>`;
+          preview.appendChild(pItem);
+        });
+      }
 
-// Balloons game
-const balloonArea=document.getElementById('balloonArea');function spawnBalloon(){const b=document.createElement('div');b.className='balloon';b.textContent=['🎈','🎉','💖','🌸','🩷'][Math.floor(Math.random()*5)];b.style.position='relative';b.addEventListener('click',()=>{alert('Bùm! Một lời chúc bay tới bạn! 💕');b.remove();});balloonArea.appendChild(b);}setInterval(()=>{if(balloonArea.children.length<6)spawnBalloon();},2000);
+      // create main li (same structure used elsewhere)
+      function createMainLi(date, title, note){
+        const li = document.createElement('li');
+        li.className = 'ms-2 relative';
+        li.dataset.tlid = 'tl_' + Date.now().toString(36) + '_' + Math.floor(Math.random()*1000);
 
-// Add note
-addNote.addEventListener('click',()=>{const n=noteInput.value.trim();if(!n)return;baseMsg+=`\n\nGhi chú thêm: ${n}`;noteInput.value='';typewriter(baseMsg);});
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'delete-tl absolute end-0 -top-1 text-xs px-2 py-1 rounded bg-white/90 hover:bg-rose-50';
+        delBtn.textContent = '🗑️';
+        li.appendChild(delBtn);
 
-// Music toggle
-let musicOn=false;toggleMusic.addEventListener('click',async()=>{try{if(!musicOn){await bgm.play();toggleMusic.textContent='⏸️ Tắt nhạc';}else{bgm.pause();toggleMusic.textContent='🎵 Bật nhạc';}musicOn=!musicOn;}catch(e){alert('Chạm vào màn hình rồi bật nhạc nhé!');}});
+        const dot = document.createElement('div');
+        dot.className = 'absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100';
+        li.appendChild(dot);
 
-// Confetti
-function spawnPetal(){const el=document.createElement('div');el.textContent=['🌸','🌺','💖','💐','🌷'][Math.floor(Math.random()*5)];el.style.position='fixed';el.style.left=Math.random()*100+'vw';el.style.top='-20px';el.style.fontSize='18px';el.style.animation=`fall ${5+Math.random()*5}s linear forwards`;document.body.appendChild(el);setTimeout(()=>el.remove(),10000);}
-function sparkle(){for(let i=0;i<8;i++)spawnPetal();}
-spawnConfetti.addEventListener('click',()=>{for(let i=0;i<40;i++)setTimeout(spawnPetal,i*30);});
-</script>
+        const tEl = document.createElement('time');
+        tEl.className = 'text-sm text-slate-500';
+        tEl.textContent = date || new Date().toISOString().slice(0,10);
+        li.appendChild(tEl);
+
+        const h4 = document.createElement('h4');
+        h4.className = 'font-semibold';
+        h4.textContent = title || '';
+        li.appendChild(h4);
+
+        const p = document.createElement('p');
+        p.className = 'text-slate-700';
+        p.textContent = note || '';
+        li.appendChild(p);
+
+        return li;
+      }
+
+      // add from this page
+      addBtn.addEventListener('click', function(){
+        const d = dateIn.value || new Date().toISOString().slice(0,10);
+        const t = (titleIn.value || '').trim();
+        const n = (noteIn.value || '').trim();
+        if(!t) return;
+        const li = createMainLi(d,t,n);
+        mainList.appendChild(li);
+        titleIn.value = '';
+        noteIn.value = '';
+        dateIn.value = '';
+        // update stat + editor + save
+        updateAfterChange();
+      });
+
+      // delegated edit/delete in editor
+      editorList.addEventListener('click', function(e){
+        const del = e.target.closest('.del-tl');
+        const edit = e.target.closest('.edit-tl');
+        const parent = e.target.closest('div[data-tlid]');
+        if(del && parent){
+          const id = parent.dataset.tlid;
+          const mli = mainList.querySelector('li[data-tlid="'+id+'"]');
+          if(mli) mli.remove();
+          updateAfterChange();
+        } else if(edit && parent){
+          const id = parent.dataset.tlid;
+          const mli = mainList.querySelector('li[data-tlid="'+id+'"]');
+          if(!mli) return;
+          // show inline editor
+          const dateEl = mli.querySelector('time');
+          const h = mli.querySelector('h4');
+          const p = mli.querySelector('p');
+          const curD = dateEl ? dateEl.textContent : '';
+          const curT = h ? h.textContent : '';
+          const curN = p ? p.textContent : '';
+
+          // replace parent content with inputs
+          parent.innerHTML = '';
+          const form = document.createElement('div');
+          form.className = 'w-full';
+          form.innerHTML = `
+            <div class="flex gap-2 mb-2">
+              <input class="edit-date glass rounded-xl px-2 py-1" type="date" value="${curD || ''}" />
+              <input class="edit-title glass rounded-xl px-2 py-1 flex-1" type="text" value="${curT || ''}" />
+            </div>
+            <div class="flex items-center gap-2">
+              <input class="edit-note glass rounded-xl px-2 py-1 flex-1" type="text" value="${curN || ''}" />
+              <button class="save-edit btn px-3 py-1">Lưu</button>
+              <button class="cancel-edit px-3 py-1 rounded bg-white">Hủy</button>
+            </div>
+          `;
+          parent.appendChild(form);
+
+          // handlers
+          parent.querySelector('.cancel-edit').addEventListener('click', function(){
+            buildEditor();
+          });
+          parent.querySelector('.save-edit').addEventListener('click', function(){
+            const nd = parent.querySelector('.edit-date').value || new Date().toISOString().slice(0,10);
+            const nt = parent.querySelector('.edit-title').value.trim();
+            const nn = parent.querySelector('.edit-note').value.trim();
+            if(!nt) return;
+            // update main li
+            if(dateEl) dateEl.textContent = nd;
+            if(h) h.textContent = nt;
+            if(p) p.textContent = nn;
+            updateAfterChange();
+          });
+        }
+      });
+
+      // When delete button inside main list is clicked (delegated handler exists elsewhere),
+      // we still want to refresh our editor view. Watch mutations to mainList for changes.
+      const mo = new MutationObserver(function(){
+        buildEditor();
+        // update timeline stat
+        const st = document.getElementById('stat-timeline');
+        if(st) st.textContent = mainList.querySelectorAll('li').length;
+      });
+      mo.observe(mainList, { childList: true, subtree: false });
+
+      function updateAfterChange(){
+        // ensure ids, refresh editor & preview
+        ensureIds();
+        buildEditor();
+        // update stat shown in top dashboard
+        const st = document.getElementById('stat-timeline');
+        if(st) st.textContent = mainList.querySelectorAll('li').length;
+        // try to save (saveState is defined in the main script; may exist by the time user interacts)
+        try{ if(typeof saveState === 'function') saveState(); }catch(e){}
+      }
+
+      // initial build
+      buildEditor();
+    });
+    </script>
+  </section>
+
+  <video id="hiddenVideo" class="hidden" playsinline muted preload="auto"></video>
+
+  <script>
+    const HIDDEN_VIDEO_URL = 'https://www.youtube.com/watch?v=30KI5SuECuc&list=RD30KI5SuECuc&start_radio=1';
+    const SLIDE_SECONDS = 4;
+    let GH_FOLDER_URL = '';
+    // Gate slideshow state
+    let gateIdx = 0; let gateTimer = null; let gateSources = [];
+
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+    const pages = { gate: $('#page-gate'), countdown: $('#page-countdown'), intro: $('#page-intro'), content: $('#page-content'), timeline: $('#page-timeline') };
+    let current = 'gate';
+    function show(page){
+      if(page===current) return;
+      const from = pages[current], to = pages[page];
+      if(!from || !to) return;
+    // [SWIPE] Add next/prev helpers + touch/mouse handlers for gate slideshow
+    function nextGate(){ gateIdx = (gateIdx + 1) % gateSources.length; setGateImages(); }
+    function prevGate(){ gateIdx = (gateIdx - 1 + gateSources.length) % gateSources.length; setGateImages(); }
+
+    (function attachGateSwipe(){
+      const area = document.getElementById('gateShow'); if(!area) return;
+      let startX = 0, dragging = false, startTime = 0;
+      const THRESHOLD = 40, MAX_TIME = 800; // px, ms
+
+      function onStart(clientX){ dragging = true; startX = clientX; startTime = Date.now(); clearInterval(gateTimer); area.classList.add('grabbing'); }
+      function onEnd(clientX){ if(!dragging) return; const dx = clientX - startX; const dt = Date.now() - startTime; dragging = false; area.classList.remove('grabbing');
+        if(Math.abs(dx) > THRESHOLD && dt < MAX_TIME){ if(dx < 0) nextGate(); else prevGate(); }
+        startGateSlide();
+      }
+
+      // Touch
+      area.addEventListener('touchstart', e=> onStart(e.touches[0].clientX), {passive:true});
+      area.addEventListener('touchend',   e=> onEnd(e.changedTouches[0].clientX));
+
+      // Mouse
+      area.addEventListener('mousedown', e=> onStart(e.clientX));
+      window.addEventListener('mouseup', e=> onEnd(e.clientX));
+      area.addEventListener('mouseleave', e=> { if(dragging) onEnd(e.clientX||startX); });
+    })();
+      // animate out current
+      from.classList.remove('active');
+      from.classList.add('leaving');
+      setTimeout(()=> from.classList.remove('leaving'), 280);
+
+      // For the content page allow normal top-aligned scrolling (not vertically centered)
+      if(page === 'content'){
+      to.style.alignItems = 'flex-start';
+      to.style.justifyContent = 'flex-start';
+      } else {
+      // clear any inline layout tweaks when showing other pages
+      to.style.alignItems = '';
+      to.style.justifyContent = '';
+      }
+
+      // ensure content page is scrolled to top when opened
+      to.classList.add('active');
+      if(page === 'content'){
+      // instant scroll to top so user can scroll down normally
+      to.scrollTop = 0;
+      }
+
+      current = page;
+    }
+    document.addEventListener('click', e=>{ const b=e.target.closest('[data-goto]'); if(!b) return; show(b.dataset.goto); });
+
+    (function(){ const target = new Date(new Date().getFullYear(), 9, 20, 0, 0, 0).getTime(); const el = $('#countText'); setInterval(()=>{ const now=Date.now(); let diff=target-now; if(diff<0) diff=0; const d=Math.floor(diff/86400000), h=Math.floor(diff%86400000/3600000), m=Math.floor(diff%3600000/60000), s=Math.floor(diff%60000/1000); el.textContent = `${d} ngày : ${h} giờ : ${m} phút : ${s} giây`; },1000); })();
+
+    (function(){ const v=$('#hiddenVideo'); v.src=HIDDEN_VIDEO_URL; v.addEventListener('canplay',()=> v.play().catch(()=>{})); ['intro','content','timeline','gate'].forEach(p=> pages[p].addEventListener('click',()=> v.play().catch(()=>{}))); })();
+
+    const letterText = "Mỗi ngày bên em đều là một món quà. Nhân 20/10, chúc em luôn rạng rỡ, khỏe mạnh và hạnh phúc. Mình sẽ nắm tay nhau đi qua thật nhiều mùa hoa nữa — yêu em rất nhiều.";
+    $('#openLetterBtn').addEventListener('click',()=>{ const env=$('#envelope'); const letter=$('#letter'); env.style.transition='transform .45s ease, opacity .45s ease'; env.style.transform='translateY(8px) scale(.97)'; env.style.opacity='0'; setTimeout(()=> env.classList.add('hidden'), 460); letter.classList.remove('hidden'); letter.style.opacity='1'; const host=$('#typeHost'); host.innerHTML=''; let i=0; const speed=18; (function type(){ if(i<=letterText.length){ host.textContent = letterText.slice(0,i++); setTimeout(type,speed);} })(); });
+
+    $('#calcDays').addEventListener('click',()=>{ const val=$('#startLove').value; if(!val) return; const diff=Math.floor((new Date()-new Date(val))/86400000); $('#stat-days').textContent=diff; saveState(); });
+
+    // Điều ước: có add riêng
+    function addWish(text){ const li=document.createElement('li'); li.className='bg-white/85 rounded-2xl p-3 shadow-soft flex items-start gap-3'; li.innerHTML=`<span>✨</span><span class="break-words">${escapeHtml(text)}</span>`; $('#wishList').appendChild(li); $('#stat-wishes').textContent = $$('#wishList li').length; }
+    $('#addWish2').addEventListener('click',()=>{ const t=$('#wishText2'); const x=t.value.trim(); if(!x) return; t.value=''; addWish(x); saveState(); });
+
+    // Promises
+    function addItem(inputSel, listSel, statId){ const t=$(inputSel); const x=t.value.trim(); if(!x) return; t.value=''; const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.innerHTML=`<span class="break-words">${escapeHtml(x)}</span>`; $(listSel).appendChild(li); if(statId) $('#'+statId).textContent = ($$('#promiseHimList li').length + $$('#promiseHerList li').length); saveState(); }
+    $('#addPromiseHim').addEventListener('click',()=> addItem('#promiseHimText','#promiseHimList','stat-promises'));
+    $('#addPromiseHer').addEventListener('click',()=> addItem('#promiseHerText','#promiseHerList','stat-promises'));
+
+    // Timeline
+    $('#addTL').addEventListener('click',()=>{ const d=$('#tlDate').value||new Date().toISOString().slice(0,10); const t=$('#tlTitle').value.trim(); const n=$('#tlNote').value.trim(); if(!t) return; const li=document.createElement('li'); li.className='ms-2'; li.innerHTML=`<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div><time class="text-sm text-slate-500">${escapeHtml(d)}</time><h4 class="font-semibold">${escapeHtml(t)}</h4><p class="text-slate-700">${escapeHtml(n)}</p>`; $('#timelineList').appendChild(li); $('#stat-timeline').textContent = $$('#timelineList li').length; $('#tlTitle').value=''; $('#tlNote').value=''; saveState(); });
+
+    // Album + slideshow
+    let slideIdx=0; let slideTimer; let slideImages=[]; const slideSeconds=SLIDE_SECONDS; $('#slideSec').textContent = slideSeconds;
+    function startSlide(){ clearInterval(slideTimer); if(slideImages.length===0){ $('#slideImage').src='background.jpg'; return; } $('#slideImage').src = slideImages[slideIdx % slideImages.length]; slideTimer = setInterval(()=>{ slideIdx=(slideIdx+1)%slideImages.length; $('#slideImage').src = slideImages[slideIdx]; }, slideSeconds*1000); }
+    $('#photoInput').addEventListener('change', (e)=>{ const grid=$('#albumGrid'); grid.innerHTML=''; slideImages=[]; const files=Array.from(e.target.files||[]); files.slice(0,24).forEach((f,i)=>{ const url=URL.createObjectURL(f); slideImages.push(url); const frame=document.createElement('figure'); frame.className='relative bg-white rounded-xl p-2 pt-3 shadow-soft'; frame.innerHTML=`<img src="${url}" alt="photo" class="w-full h-36 object-cover rounded-lg select-none"/><figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`; grid.appendChild(frame); }); startSlide(); saveState(); });
+
+    // Music
+    function parseYouTube(url){ try{ const u=new URL(url); if(u.hostname.includes('youtu.be')) return u.pathname.slice(1); if(u.searchParams.get('v')) return u.searchParams.get('v'); return null; }catch(e){ return null; } }
+    function parseSpotifyEmbed(url){ try{ const u=new URL(url); return url.replace('open.spotify.com/','open.spotify.com/embed/'); }catch(e){ return null; } }
+    function playMusicFrom(url){ let src=''; let title='Bài hát yêu thích'; if(url.includes('youtube.com') || url.includes('youtu.be')){ const id=parseYouTube(url); if(id) src=`https://www.youtube.com/embed/${id}?autoplay=1&rel=0`; title='YouTube'; } else if(url.includes('open.spotify.com')){ src=parseSpotifyEmbed(url); title='Spotify'; } if(src){ $('#musicFrame').src=src; $('#nowTitle').textContent=title; saveState(); } }
+    $('#playMusic').addEventListener('click',()=>{ const u=$('#musicUrl').value.trim(); if(!u) return; playMusicFrom(u); });
+    // Load album from a GitHub folder
+    function parseGitFolder(url){
+      // supports: https://github.com/user/repo/tree/branch/path/to/dir
+      //           https://raw.githubusercontent.com/user/repo/branch/path/to/dir/
+      try{
+        const u=new URL(url);
+        if(u.hostname==='raw.githubusercontent.com'){
+          const [owner,repo,branch,...rest]=u.pathname.replace(/^\//,'').split('/');
+          return {owner,repo,branch,path:rest.join('/')};
+        }
+        if(u.hostname==='github.com'){
+          const parts=u.pathname.replace(/^\//,'').split('/');
+          const owner=parts[0], repo=parts[1];
+          let branch='main', path='';
+          const idx=parts.indexOf('tree');
+          if(idx!==-1){ branch=parts[idx+1]; path=parts.slice(idx+2).join('/'); }
+          return {owner,repo,branch,path};
+        }
+      }catch(e){ }
+      return null;
+    }
+    async function loadFromGitHubFolder(url){
+      const info=parseGitFolder(url);
+      if(!info){ alert('Link không hợp lệ. Dùng dạng https://github.com/user/repo/tree/branch/folder'); return; }
+      const api=`https://api.github.com/repos/${info.owner}/${info.repo}/contents/${info.path}?ref=${encodeURIComponent(info.branch)}`;
+      const res=await fetch(api);
+      if(!res.ok){ alert('Không lấy được danh sách ảnh từ GitHub'); return; }
+      const data=await res.json();
+      const imgs=(data||[]).filter(x=>x.type==='file' && /\.(png|jpg|jpeg|gif|webp)$/i.test(x.name)).map(x=>x.download_url);
+      if(imgs.length===0){ alert('Thư mục không có ảnh phù hợp'); return; }
+      slideImages=imgs; renderAlbumGrid(imgs); (function start(){ clearInterval(slideTimer); let i=0; if(slideImages.length){ $('#slideImage').src=slideImages[0]; slideTimer=setInterval(()=>{ i=(i+1)%slideImages.length; $('#slideImage').src=slideImages[i]; }, SLIDE_SECONDS*1000); } })(); refreshGateSources(); GH_FOLDER_URL=url; saveState();
+    }
+    const ghBtn=document.getElementById('loadGh'); if(ghBtn){ ghBtn.addEventListener('click', ()=>{ const url=$('#ghFolder').value.trim(); if(url) loadFromGitHubFolder(url); }); }
+
+    // Save / Load
+    function currentState(){ return { startLove: $('#startLove').value, wishes: $$('#wishList li span:last-child').map(s=>s.textContent), promiseHim: $$('#promiseHimList li').map(li=>li.textContent), promiseHer: $$('#promiseHerList li').map(li=>li.textContent), timeline: $$('#timelineList li').map(li=>({ date: li.querySelector('time').textContent, title: li.querySelector('h4').textContent, note: li.querySelector('p').textContent })), musicUrl: $('#musicUrl').value, slideImages, ghFolder: GH_FOLDER_URL }; }
+    function saveState(){ try{ localStorage.setItem('love20_state', JSON.stringify(currentState())); }catch(e){} }
+    function loadState(){ try{ const raw=localStorage.getItem('love20_state'); if(!raw) return; const s=JSON.parse(raw); if(s.startLove) $('#startLove').value=s.startLove; (s.wishes||[]).forEach(t=>{ addWish(t); }); (s.promiseHim||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHimList').appendChild(li); }); (s.promiseHer||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHerList').appendChild(li); }); (s.timeline||[]).forEach(x=>{ const li=document.createElement('li'); li.className='ms-2'; li.innerHTML=`<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div><time class="text-sm text-slate-500">${escapeHtml(x.date)}</time><h4 class="font-semibold">${escapeHtml(x.title)}</h4><p class="text-slate-700">${escapeHtml(x.note||'')}</p>`; $('#timelineList').appendChild(li); }); if(s.musicUrl){ $('#musicUrl').value=s.musicUrl; }
+      if(Array.isArray(s.slideImages) && s.slideImages.length){ slideImages=s.slideImages; renderAlbumGrid(slideImages); (function start(){ clearInterval(slideTimer); let i=0; if(slideImages.length){ $('#slideImage').src=slideImages[0]; slideTimer=setInterval(()=>{ i=(i+1)%slideImages.length; $('#slideImage').src=slideImages[i]; }, SLIDE_SECONDS*1000); } })(); }
+      if(s.ghFolder){ GH_FOLDER_URL=s.ghFolder; const gh=$('#ghFolder'); if(gh) gh.value=GH_FOLDER_URL; }
+    }catch(e){}
+    }
+    document.getElementById('saveAll').addEventListener('click', saveState);
+    document.getElementById('exportJson').addEventListener('click', ()=>{ const data=JSON.stringify(currentState(),null,2); const blob=new Blob([data],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='love20-data.json'; a.click(); });
+    document.getElementById('importJson').addEventListener('change', async (e)=>{ const f=e.target.files[0]; if(!f) return; const text=await f.text(); localStorage.setItem('love20_state', text); location.reload(); });
+
+    show('gate');
+    loadState();
+    // Khởi động gate slideshow lần đầu
+    refreshGateSources();
+
+    // Save / Load
+    function currentState(){ return { startLove: $('#startLove').value, wishes: $$('#wishList li span:last-child').map(s=>s.textContent), promiseHim: $$('#promiseHimList li').map(li=>li.textContent), promiseHer: $$('#promiseHerList li').map(li=>li.textContent), timeline: $$('#timelineList li').map(li=>({ date: li.querySelector('time').textContent, title: li.querySelector('h4').textContent, note: li.querySelector('p').textContent })), musicUrl: $('#musicUrl').value, slideImages }; }
+    function saveState(){ try{ localStorage.setItem('love20_state', JSON.stringify(currentState())); }catch(e){} }
+    function loadState(){ try{ const raw=localStorage.getItem('love20_state'); if(!raw) return; const s=JSON.parse(raw); if(s.startLove) $('#startLove').value=s.startLove; (s.wishes||[]).forEach(t=>{ addWish(t); }); (s.promiseHim||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHimList').appendChild(li); }); (s.promiseHer||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHerList').appendChild(li); }); (s.timeline||[]).forEach(x=>{ const li=document.createElement('li'); li.className='ms-2'; li.innerHTML=`<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div><time class="text-sm text-slate-500">${escapeHtml(x.date)}</time><h4 class="font-semibold">${escapeHtml(x.title)}</h4><p class="text-slate-700">${escapeHtml(x.note||'')}</p>`; $('#timelineList').appendChild(li); }); if(s.musicUrl){ $('#musicUrl').value=s.musicUrl; playMusicFrom(s.musicUrl); } if(Array.isArray(s.slideImages) && s.slideImages.length){ slideImages=s.slideImages; startSlide(); } $('#stat-wishes').textContent=$$('#wishList li').length; $('#stat-promises').textContent=$$('#promiseHimList li').length + $$('#promiseHerList li').length; $('#stat-timeline').textContent=$$('#timelineList li').length; }catch(e){} }
+    $('#saveAll').addEventListener('click', saveState);
+    $('#exportJson').addEventListener('click', ()=>{ const data=JSON.stringify(currentState(),null,2); const blob=new Blob([data],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='love20-data.json'; a.click(); });
+    $('#importJson').addEventListener('change', async (e)=>{ const f=e.target.files[0]; if(!f) return; const text=await f.text(); localStorage.setItem('love20_state', text); location.reload(); });
+
+    show('gate');
+    loadState();
+
+    function escapeHtml(str){ return str.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;'); }
+  </script>
 </body>
 </html>
