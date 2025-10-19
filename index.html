@@ -727,7 +727,7 @@
 
     // Album + slideshow
     let slideIdx=0; let slideTimer; let slideImages=[]; const slideSeconds=SLIDE_SECONDS; $('#slideSec').textContent = slideSeconds;
-    function startSlide(){ clearInterval(slideTimer); if(slideImages.length===0){ $('#slideImage').src='https://github.com/tranha1/happy-20-10/main/photos/gallery'; return; } $('#slideImage').src = slideImages[slideIdx % slideImages.length]; slideTimer = setInterval(()=>{ slideIdx=(slideIdx+1)%slideImages.length; $('#slideImage').src = slideImages[slideIdx]; }, slideSeconds*1000); }
+    function startSlide(){ clearInterval(slideTimer); if(slideImages.length===0){ $('#slideImage').src='https://tranha1.github.io/happy-20-10/photos/gallery'; return; } $('#slideImage').src = slideImages[slideIdx % slideImages.length]; slideTimer = setInterval(()=>{ slideIdx=(slideIdx+1)%slideImages.length; $('#slideImage').src = slideImages[slideIdx]; }, slideSeconds*1000); }
     $('#photoInput').addEventListener('change', (e)=>{ const grid=$('#albumGrid'); grid.innerHTML=''; slideImages=[]; const files=Array.from(e.target.files||[]); files.slice(0,24).forEach((f,i)=>{ const url=URL.createObjectURL(f); slideImages.push(url); const frame=document.createElement('figure'); frame.className='relative bg-white rounded-xl p-2 pt-3 shadow-soft'; frame.innerHTML=`<img src="${url}" alt="photo" class="w-full h-36 object-cover rounded-lg select-none"/><figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`; grid.appendChild(frame); }); startSlide(); saveState(); });
 
     // Music
@@ -798,7 +798,7 @@
     loadState();
 
     (async function autoLoadContentFromRepo(){
-  const url = 'https://raw.githubusercontent.com/<tranha1>/<happy-20-1->/<main>/data/content.json';
+  const url = 'https://tranha1.github.io/happy-20-10/data/content.json';
   try{
     const res = await fetch(url, {cache: 'no-store'});
     if(!res.ok) return;
