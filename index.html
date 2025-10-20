@@ -644,111 +644,65 @@
     let GH_FOLDER_URL = '';
     // Gate slideshow state
     let gateIdx = 0; let gateTimer = null; let gateSources = [];
-   // Small helper implementations to avoid ReferenceError when code calls refreshGateSources/setGateImages/startGateSlide.
-    // These use slideImages if available, otherwise fall back to a single background image.
-    // Resolve relative or protocol-relative URLs to absolute ones (handles "../photo/..." cases)
-    function resolveUrl(path){
-      try{
-        if(!path) return path;
-        // pass through data:, blob:, http(s):, protocol-relative (//) and absolute paths
-        if(/^data:|^blob:|^\/\/|^[a-z][a-z0-9+.-]*:/i.test(path)) return path;
-        return new URL(path, location.href).href;
-      }catch(e){
-        return path;
-      }
-    }
 
-    function setGateImages(){
-      try{
-        const prev = document.getElementById('gatePrev');
-        const curr = document.getElementById('gateCurr');
-        const next = document.getElementById('gateNext');
-        if(!gateSources || gateSources.length === 0) return;
-        const len = gateSources.length;
-        const idx = ((gateIdx % len) + len) % len;
-        if(curr) curr.src = resolveUrl(gateSources[idx]);
-        if(prev) prev.src = resolveUrl(gateSources[(idx - 1 + len) % len]);
-        if(next) next.src = resolveUrl(gateSources[(idx + 1) % len]);
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
-        // update dots
-        const dotsWrap = document.getElementById('gateDots');
-        if(dotsWrap){
-          dotsWrap.innerHTML = '';
-          gateSources.forEach((_, i) => {
-            const b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'dot' + (i === idx ? ' active' : '');
-            b.addEventListener('click', () => { gateIdx = i; setGateImages(); startGateSlide(); });
-            dotsWrap.appendChild(b);
-          });
-        }
-      }catch(e){ /* fail silently */ }
-    }
+    const pages = { gate: $('#page-gate'), countdown: $('#page-countdown'), intro: $('#page-intro'), content: $('#page-content'), timeline: $('#page-timeline') };
+    let current = 'gate';
+    function show(page){
+      if(page===current) return;
+      const from = pages[current], to = pages[page];
+      if(!from || !to) return;
+    // [SWIPE] Add next/prev helpers + touch/mouse handlers for gate slideshow
+    function nextGate(){ gateIdx = (gateIdx + 1) % gateSources.length; setGateImages(); }
+    function prevGate(){ gateIdx = (gateIdx - 1 + gateSources.length) % gateSources.length; setGateImages(); }
 
-    function startGateSlide(){
-      try{
-        clearInterval(gateTimer);
-        if(!gateSources || gateSources.length <= 1) return;
-        gateTimer = setInterval(()=>{ gateIdx = (gateIdx + 1) % gateSources.length; setGateImages(); }, SLIDE_SECONDS * 1000);
-      }catch(e){ /* fail silently */ }
-    }
+    (function attachGateSwipe(){
+      const area = document.getElementById('gateShow'); if(!area) return;
+      let startX = 0, dragging = false, startTime = 0;
+      const THRESHOLD = 40, MAX_TIME = 800; // px, ms
 
-    function refreshGateSources(){
-      try{
-        // prefer explicit slideImages (user uploaded or loaded), otherwise try GH folder images, otherwise fallback
-        if(Array.isArray(window.slideImages) && window.slideImages.length){
-          gateSources = window.slideImages.slice();
-        } else {
-          gateSources = ['https://tranha1.github.io/happy-20-10/photos/gallery/anh1.jpg'];
-        }
-        // ensure index in range and render
-        gateIdx = gateIdx % Math.max(1, gateSources.length);
-        setGateImages();
+      function onStart(clientX){ dragging = true; startX = clientX; startTime = Date.now(); clearInterval(gateTimer); area.classList.add('grabbing'); }
+      function onEnd(clientX){ if(!dragging) return; const dx = clientX - startX; const dt = Date.now() - startTime; dragging = false; area.classList.remove('grabbing');
+        if(Math.abs(dx) > THRESHOLD && dt < MAX_TIME){ if(dx < 0) nextGate(); else prevGate(); }
         startGateSlide();
-      }catch(e){ /* fail silently */ }
-    }
+      }
+
+      // Touch
+      area.addEventListener('touchstart', e=> onStart(e.touches[0].clientX), {passive:true});
+      area.addEventListener('touchend',   e=> onEnd(e.changedTouches[0].clientX));
+
+      // Mouse
+      area.addEventListener('mousedown', e=> onStart(e.clientX));
+      window.addEventListener('mouseup', e=> onEnd(e.clientX));
+      area.addEventListener('mouseleave', e=> { if(dragging) onEnd(e.clientX||startX); });
+    })();
+      // animate out current
+      from.classList.remove('active');
+      from.classList.add('leaving');
+      setTimeout(()=> from.classList.remove('leaving'), 280);
+
+      // For the content page allow normal top-aligned scrolling (not vertically centered)
+      if(page === 'content'){
+      to.style.alignItems = 'flex-start';
+      to.style.justifyContent = 'flex-start';
+      } else {
+      // clear any inline layout tweaks when showing other pages
+      to.style.alignItems = '';
+      to.style.justifyContent = '';
+      }
+
+      // ensure content page is scrolled to top when opened
+      to.classList.add('active');
+      if(page === 'content'){
       // instant scroll to top so user can scroll down normally
       to.scrollTop = 0;
-      
+      }
 
       current = page;
-    
-    // Replace truncated/broken "show" code with a simple safe show() to switch pages.
-    let _currentPage = null;
-    function show(name){
-      const pageMap = {
-        gate: document.getElementById('page-gate'),
-        countdown: document.getElementById('page-countdown'),
-        intro: document.getElementById('page-intro'),
-        content: document.getElementById('page-content'),
-        timeline: document.getElementById('page-timeline')
-      };
-      const target = pageMap[name];
-      if(!_currentPage && target){
-        target.classList.add('active');
-        _currentPage = target;
-        window.scrollTo(0,0);
-        return;
-      }
-      if(_currentPage && _currentPage !== target){
-        _currentPage.classList.remove('active');
-        _currentPage.classList.add('leaving');
-        setTimeout(()=>{ _currentPage.classList.remove('leaving'); }, 350);
-      }
-      if(target){
-        target.classList.add('active');
-        _currentPage = target;
-        window.scrollTo(0,0);
-      }
     }
-    document.addEventListener('click', e=>{
-      const b = e.target.closest('[data-goto]');
-      if(!b) return;
-      show(b.dataset.goto);
-    });
-
-    // fix hidden video-click binding safely (pages variable might not exist)
-    (function(){ const v=$('#hiddenVideo'); v.src=HIDDEN_VIDEO_URL; v.addEventListener('canplay',()=> v.play().catch(()=>{})); ['page-intro','page-content','page-timeline','page-gate'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('click', ()=> v.play().catch(()=>{})); }); })();
+    document.addEventListener('click', e=>{ const b=e.target.closest('[data-goto]'); if(!b) return; show(b.dataset.goto); });
 
     (function(){ const target = new Date(new Date().getFullYear(), 9, 20, 0, 0, 0).getTime(); const el = $('#countText'); setInterval(()=>{ const now=Date.now(); let diff=target-now; if(diff<0) diff=0; const d=Math.floor(diff/86400000), h=Math.floor(diff%86400000/3600000), m=Math.floor(diff%3600000/60000), s=Math.floor(diff%60000/1000); el.textContent = `${d} ngày : ${h} giờ : ${m} phút : ${s} giây`; },1000); })();
 
@@ -771,58 +725,10 @@
     // Timeline
     $('#addTL').addEventListener('click',()=>{ const d=$('#tlDate').value||new Date().toISOString().slice(0,10); const t=$('#tlTitle').value.trim(); const n=$('#tlNote').value.trim(); if(!t) return; const li=document.createElement('li'); li.className='ms-2'; li.innerHTML=`<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div><time class="text-sm text-slate-500">${escapeHtml(d)}</time><h4 class="font-semibold">${escapeHtml(t)}</h4><p class="text-slate-700">${escapeHtml(n)}</p>`; $('#timelineList').appendChild(li); $('#stat-timeline').textContent = $$('#timelineList li').length; $('#tlTitle').value=''; $('#tlNote').value=''; saveState(); });
 
-    let slideIdx = 0; let slideTimer; let slideImages = []; const slideSeconds = SLIDE_SECONDS; $('#slideSec').textContent = slideSeconds;
-    function startSlide(){
-      clearInterval(slideTimer);
-      if(!slideImages || slideImages.length === 0){
-        // fallback to a single repository background image (use a real image file or GH_FOLDER_URL)
-        const fallback = GH_FOLDER_URL || 'https://tranha1.github.io/happy-20-10/photos/gallery/anh1.jpg';
-        $('#slideImage').src = resolveUrl(fallback);
-        return;
-      }
-      slideIdx = slideIdx % slideImages.length;
-      $('#slideImage').src = resolveUrl(slideImages[slideIdx]);
-      slideTimer = setInterval(()=>{
-        slideIdx = (slideIdx + 1) % slideImages.length;
-        $('#slideImage').src = resolveUrl(slideImages[slideIdx]);
-      }, slideSeconds * 1000);
-    }
-
-    // Read selected files as data URLs (persistable) instead of transient object URLs
-    $('#photoInput').addEventListener('change', async (e) => {
-      const grid = $('#albumGrid');
-      grid.innerHTML = '';
-      slideImages = [];
-      const files = Array.from(e.target.files || []).slice(0, 24);
-      if(files.length === 0){
-      startSlide();
-      saveState();
-      return;
-      }
-
-      const readAsDataURL = (file) => new Promise((resolve, reject) => {
-      const fr = new FileReader();
-      fr.onload = () => resolve(fr.result);
-      fr.onerror = () => reject(new Error('File read error'));
-      fr.readAsDataURL(file);
-      });
-
-      try{
-      const dataUrls = await Promise.all(files.map(f => readAsDataURL(f)));
-      dataUrls.forEach((url, i) => {
-        slideImages.push(url);
-        const frame = document.createElement('figure');
-        frame.className = 'relative bg-white rounded-xl p-2 pt-3 shadow-soft';
-        frame.innerHTML = `<img src="${url}" alt="photo" class="w-full h-36 object-cover rounded-lg select-none"/><figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`;
-        grid.appendChild(frame);
-      });
-      startSlide();
-      saveState();
-      }catch(err){
-      console.error(err);
-      alert('Không thể đọc file ảnh. Vui lòng thử lại.');
-      }
-    });
+    // Album + slideshow
+    let slideIdx=0; let slideTimer; let slideImages=[]; const slideSeconds=SLIDE_SECONDS; $('#slideSec').textContent = slideSeconds;
+    function startSlide(){ clearInterval(slideTimer); if(slideImages.length===0){ $('#slideImage').src='https://tranha1.github.io/happy-20-10/photos/gallery'; return; } $('#slideImage').src = slideImages[slideIdx % slideImages.length]; slideTimer = setInterval(()=>{ slideIdx=(slideIdx+1)%slideImages.length; $('#slideImage').src = slideImages[slideIdx]; }, slideSeconds*1000); }
+    $('#photoInput').addEventListener('change', (e)=>{ const grid=$('#albumGrid'); grid.innerHTML=''; slideImages=[]; const files=Array.from(e.target.files||[]); files.slice(0,24).forEach((f,i)=>{ const url=URL.createObjectURL(f); slideImages.push(url); const frame=document.createElement('figure'); frame.className='relative bg-white rounded-xl p-2 pt-3 shadow-soft'; frame.innerHTML=`<img src="${url}" alt="photo" class="w-full h-36 object-cover rounded-lg select-none"/><figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`; grid.appendChild(frame); }); startSlide(); saveState(); });
 
     // Music
     function parseYouTube(url){ try{ const u=new URL(url); if(u.hostname.includes('youtu.be')) return u.pathname.slice(1); if(u.searchParams.get('v')) return u.searchParams.get('v'); return null; }catch(e){ return null; } }
@@ -858,40 +764,10 @@
       if(!res.ok){ alert('Không lấy được danh sách ảnh từ GitHub'); return; }
       const data=await res.json();
       const imgs=(data||[]).filter(x=>x.type==='file' && /\.(png|jpg|jpeg|gif|webp)$/i.test(x.name)).map(x=>x.download_url);
-
       if(imgs.length===0){ alert('Thư mục không có ảnh phù hợp'); return; }
-      slideImages = imgs;
-
-     // render album grid inline (renderAlbumGrid was not defined in original file)
-      const grid = document.querySelector('#albumGrid');
-      if (grid) {
-        grid.innerHTML = '';
-        slideImages.forEach((url, i) => {
-          const frame = document.createElement('figure');
-          frame.className = 'relative bg-white rounded-xl p-2 pt-3 shadow-soft';
-      if(Array.isArray(s.slideImages) && s.slideImages.length){
-        slideImages = s.slideImages;
-
-      renderAlbumGrid(slideImages);
-
-
-        // render album grid inline (renderAlbumGrid was not defined)
-        const grid = document.querySelector('#albumGrid');
-        if (grid) {
-          grid.innerHTML = '';
-          slideImages.forEach((url, i) => {
-            const f = document.createElement('figure');
-            f.className = 'relative bg-white rounded-xl p-2 pt-3 shadow-soft';
-            f.innerHTML = `<img src="${url}" class="w-full h-36 object-cover rounded-lg select-none"/><figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`;
-            grid.appendChild(f);
-          });
-        }
-        (function start(){ clearInterval(slideTimer); let i=0; if(slideImages.length){ $('#slideImage').src=slideImages[0]; slideTimer=setInterval(()=>{ i=(i+1)%slideImages.length; $('#slideImage').src=slideImages[i]; }, SLIDE_SECONDS*1000); } })();
-      }
-          grid.appendChild(frame);
-        });
-      }
-      (function start(){ clearInterval(slideTimer); let i=0; if(slideImages.length){ $('#slideImage').src=slideImages[0]; slideTimer=setInterval(()=>{ i=(i+1)%slideImages.length; $('#slideImage').src=slideImages[i]; }, SLIDE_SECONDS*1000); } })();
+      slideImages=imgs; renderAlbumGrid(imgs); (function start(){ clearInterval(slideTimer); let i=0; if(slideImages.length){ $('#slideImage').src=slideImages[0]; slideTimer=setInterval(()=>{ i=(i+1)%slideImages.length; $('#slideImage').src=slideImages[i]; }, SLIDE_SECONDS*1000); } })(); refreshGateSources(); GH_FOLDER_URL=url; saveState();
+    }
+    const ghBtn=document.getElementById('loadGh'); if(ghBtn){ ghBtn.addEventListener('click', ()=>{ const url=$('#ghFolder').value.trim(); if(url) loadFromGitHubFolder(url); }); }
 
     // Save / Load
     function currentState(){ return { startLove: $('#startLove').value, wishes: $$('#wishList li span:last-child').map(s=>s.textContent), promiseHim: $$('#promiseHimList li').map(li=>li.textContent), promiseHer: $$('#promiseHerList li').map(li=>li.textContent), timeline: $$('#timelineList li').map(li=>({ date: li.querySelector('time').textContent, title: li.querySelector('h4').textContent, note: li.querySelector('p').textContent })), musicUrl: $('#musicUrl').value, slideImages, ghFolder: GH_FOLDER_URL }; }
@@ -908,9 +784,7 @@
     show('gate');
     loadState();
     // Khởi động gate slideshow lần đầu
-    startSlide();
     refreshGateSources();
-    GH_FOLDER_URL = url;}
 
     // Save / Load
     function currentState(){ return { startLove: $('#startLove').value, wishes: $$('#wishList li span:last-child').map(s=>s.textContent), promiseHim: $$('#promiseHimList li').map(li=>li.textContent), promiseHer: $$('#promiseHerList li').map(li=>li.textContent), timeline: $$('#timelineList li').map(li=>({ date: li.querySelector('time').textContent, title: li.querySelector('h4').textContent, note: li.querySelector('p').textContent })), musicUrl: $('#musicUrl').value, slideImages }; }
@@ -920,55 +794,58 @@
     $('#exportJson').addEventListener('click', ()=>{ const data=JSON.stringify(currentState(),null,2); const blob=new Blob([data],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='love20-data.json'; a.click(); });
     $('#importJson').addEventListener('change', async (e)=>{ const f=e.target.files[0]; if(!f) return; const text=await f.text(); localStorage.setItem('love20_state', text); location.reload(); });
 
+    show('gate');
+    loadState();
+
     (async function autoLoadContentFromRepo(){
-   const url = 'https://tranha1.github.io/happy-20-10/data/content.json';
-   try{
-     const res = await fetch(url, {cache: 'no-store'});
-     if(!res.ok) return;
-     const s = await res.json();
-     // đổ dữ liệu vào giao diện
-     if(s.startLove) document.querySelector('#startLove').value = s.startLove;
-     (s.wishes||[]).forEach(t => {
-       const li = document.createElement('li');
-       li.className = 'bg-white/85 rounded-2xl p-3 shadow-soft flex items-start gap-3';
-       li.innerHTML = `<span>✨</span><span class="break-words">${t}</span>`;
-       document.querySelector('#wishList').appendChild(li);
-     });
-     (s.promiseHim||[]).forEach(t => {
-       const li = document.createElement('li');
-       li.className = 'bg-white/85 rounded-xl px-3 py-2 shadow-soft';
-       li.textContent = t;
-       document.querySelector('#promiseHimList').appendChild(li);
-     });
-     (s.promiseHer||[]).forEach(t => {
-       const li = document.createElement('li');
-       li.className = 'bg-white/85 rounded-xl px-3 py-2 shadow-soft';
-       li.textContent = t;
-       document.querySelector('#promiseHerList').appendChild(li);
-     });
-     (s.timeline||[]).forEach(x => {
-       const li = document.createElement('li');
-       li.className = 'ms-2';
-       li.innerHTML = `<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div>
-         <time class="text-sm text-slate-500">${x.date}</time>
-         <h4 class="font-semibold">${x.title}</h4>
-         <p class="text-slate-700">${x.note||''}</p>`;
-       document.querySelector('#timelineList').appendChild(li);
-     });
-     if(s.musicUrl){ document.querySelector('#musicUrl').value=s.musicUrl; }
-     if(Array.isArray(s.slideImages) && s.slideImages.length){
-       // render album + slideshow luôn (resolve relative urls)
-       const grid = document.querySelector('#albumGrid'); grid.innerHTML='';
-       s.slideImages.forEach((url,i)=>{
-         const f=document.createElement('figure');
-         f.className='relative bg-white rounded-xl p-2 pt-3 shadow-soft';
-         f.innerHTML=`<img src="${resolveUrl(url)}" class="w-full h-36 object-cover rounded-lg select-none"/>
-                      <figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`;
-         grid.appendChild(f);
-       });
-     }
-   }catch(e){}
- })();
+  const url = 'https://tranha1.github.io/happy-20-10/data/content.json';
+  try{
+    const res = await fetch(url, {cache: 'no-store'});
+    if(!res.ok) return;
+    const s = await res.json();
+    // đổ dữ liệu vào giao diện
+    if(s.startLove) document.querySelector('#startLove').value = s.startLove;
+    (s.wishes||[]).forEach(t => {
+      const li = document.createElement('li');
+      li.className = 'bg-white/85 rounded-2xl p-3 shadow-soft flex items-start gap-3';
+      li.innerHTML = `<span>✨</span><span class="break-words">${t}</span>`;
+      document.querySelector('#wishList').appendChild(li);
+    });
+    (s.promiseHim||[]).forEach(t => {
+      const li = document.createElement('li');
+      li.className = 'bg-white/85 rounded-xl px-3 py-2 shadow-soft';
+      li.textContent = t;
+      document.querySelector('#promiseHimList').appendChild(li);
+    });
+    (s.promiseHer||[]).forEach(t => {
+      const li = document.createElement('li');
+      li.className = 'bg-white/85 rounded-xl px-3 py-2 shadow-soft';
+      li.textContent = t;
+      document.querySelector('#promiseHerList').appendChild(li);
+    });
+    (s.timeline||[]).forEach(x => {
+      const li = document.createElement('li');
+      li.className = 'ms-2';
+      li.innerHTML = `<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div>
+        <time class="text-sm text-slate-500">${x.date}</time>
+        <h4 class="font-semibold">${x.title}</h4>
+        <p class="text-slate-700">${x.note||''}</p>`;
+      document.querySelector('#timelineList').appendChild(li);
+    });
+    if(s.musicUrl){ document.querySelector('#musicUrl').value=s.musicUrl; }
+    if(Array.isArray(s.slideImages) && s.slideImages.length){
+      // render album + slideshow luôn
+      const grid = document.querySelector('#albumGrid'); grid.innerHTML='';
+      s.slideImages.forEach((url,i)=>{
+        const f=document.createElement('figure');
+        f.className='relative bg-white rounded-xl p-2 pt-3 shadow-soft';
+        f.innerHTML=`<img src="${url}" class="w-full h-36 object-cover rounded-lg select-none"/>
+                     <figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`;
+        grid.appendChild(f);
+      });
+    }
+  }catch(e){}
+})();
 
     function escapeHtml(str){ return str.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;'); }
   </script>
