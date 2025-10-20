@@ -119,16 +119,34 @@
   </aside>
 
 <!-- PAGE: Gate – Trình chiếu ảnh focus ở giữa, ảnh sau bị mờ -->
-  <section id="page-gate" class="page active">
-    <div class="relative w-[92vw] md:w-[78vw] h-[70vh] rounded-3xl overflow-hidden glass">
-      <div id="gateShow" class="absolute inset-0 grid place-items-center">
-        <img id="gatePrev" class="gate-img gate-side left" alt="prev"/>
-        <img id="gateCurr" class="gate-img gate-main" alt="current"/>
-        <img id="gateNext" class="gate-img gate-side right" alt="next"/>
-      </div>
-      <div class="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-1.5" id="gateDots"></div>
+<section id="page-gate" class="page active">
+  <div class="relative w-[92vw] md:w-[78vw] h-[70vh] rounded-3xl overflow-hidden glass">
+    <div id="gateShow" class="absolute inset-0 grid place-items-center">
+
+      <!-- Ảnh trước (mờ, lệch trái) -->
+      <img id="gatePrev"
+           class="gate-img gate-side left"
+           alt="prev"
+           src="https://raw.githubusercontent.com/tranha1/happy-20-10/main/photos/gallery/anh1.jpg"/>
+
+      <!-- Ảnh trung tâm (rõ nét, focus) -->
+      <img id="gateCurr"
+           class="gate-img gate-main"
+           alt="current"
+           src="https://raw.githubusercontent.com/tranha1/happy-20-10/main/photos/gallery/anh2.jpg"/>
+
+      <!-- Ảnh tiếp theo (mờ, lệch phải) -->
+      <img id="gateNext"
+           class="gate-img gate-side right"
+           alt="next"
+           src="https://raw.githubusercontent.com/tranha1/happy-20-10/main/photos/gallery/anh3.jpg"/>
+
     </div>
-  </section>
+
+    <!-- Dấu chấm chuyển slide -->
+    <div class="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-1.5" id="gateDots"></div>
+  </div>
+</section>
 
   <section id="page-countdown" class="page">
     <div class="glass rounded-3xl p-6 md:p-10 shadow-soft text-center max-w-lg animate-slideUp">
