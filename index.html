@@ -699,7 +699,7 @@
         if(Array.isArray(window.slideImages) && window.slideImages.length){
           gateSources = window.slideImages.slice();
         } else {
-          gateSources = ['https://tranha1.github.io/happy-20-10/photos/gallery'];
+          gateSources = ['https://tranha1.github.io/happy-20-10/photos/gallery/anh1.jpg'];
         }
         // ensure index in range and render
         gateIdx = gateIdx % Math.max(1, gateSources.length);
@@ -709,10 +709,10 @@
     }
       // instant scroll to top so user can scroll down normally
       to.scrollTop = 0;
-      }
+      
 
       current = page;
-    }
+    
     // Replace truncated/broken "show" code with a simple safe show() to switch pages.
     let _currentPage = null;
     function show(name){
@@ -776,7 +776,7 @@
       clearInterval(slideTimer);
       if(!slideImages || slideImages.length === 0){
         // fallback to a single repository background image (use a real image file or GH_FOLDER_URL)
-        const fallback = GH_FOLDER_URL || 'https://tranha1.github.io/happy-20-10/photos/background/background.jpg';
+        const fallback = GH_FOLDER_URL || 'https://tranha1.github.io/happy-20-10/photos/gallery/anh1.jpg';
         $('#slideImage').src = resolveUrl(fallback);
         return;
       }
@@ -858,7 +858,10 @@
       if(!res.ok){ alert('Không lấy được danh sách ảnh từ GitHub'); return; }
       const data=await res.json();
       const imgs=(data||[]).filter(x=>x.type==='file' && /\.(png|jpg|jpeg|gif|webp)$/i.test(x.name)).map(x=>x.download_url);
+
       if(imgs.length===0){ alert('Thư mục không có ảnh phù hợp'); return; }
+      slideImages = imgs;
+
      // render album grid inline (renderAlbumGrid was not defined in original file)
       const grid = document.querySelector('#albumGrid');
       if (grid) {
@@ -868,6 +871,10 @@
           frame.className = 'relative bg-white rounded-xl p-2 pt-3 shadow-soft';
       if(Array.isArray(s.slideImages) && s.slideImages.length){
         slideImages = s.slideImages;
+
+      renderAlbumGrid(slideImages);
+
+
         // render album grid inline (renderAlbumGrid was not defined)
         const grid = document.querySelector('#albumGrid');
         if (grid) {
@@ -901,7 +908,9 @@
     show('gate');
     loadState();
     // Khởi động gate slideshow lần đầu
+    startSlide();
     refreshGateSources();
+    GH_FOLDER_URL = url;}
 
     // Save / Load
     function currentState(){ return { startLove: $('#startLove').value, wishes: $$('#wishList li span:last-child').map(s=>s.textContent), promiseHim: $$('#promiseHimList li').map(li=>li.textContent), promiseHer: $$('#promiseHerList li').map(li=>li.textContent), timeline: $$('#timelineList li').map(li=>({ date: li.querySelector('time').textContent, title: li.querySelector('h4').textContent, note: li.querySelector('p').textContent })), musicUrl: $('#musicUrl').value, slideImages }; }
