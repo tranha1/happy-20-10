@@ -790,8 +790,29 @@
 
     // Album + slideshow
     let slideIdx=0; let slideTimer; let slideImages=[]; const slideSeconds=SLIDE_SECONDS; $('#slideSec').textContent = slideSeconds;
-    function startSlide(){ clearInterval(slideTimer); if(slideImages.length===0){ $('#slideImage').src='https://tranha1.github.io/happy-20-10/photos/gallery'; return; } $('#slideImage').src = slideImages[slideIdx % slideImages.length]; slideTimer = setInterval(()=>{ slideIdx=(slideIdx+1)%slideImages.length; $('#slideImage').src = slideImages[slideIdx]; }, slideSeconds*1000); }
-    $('#photoInput').addEventListener('change', (e)=>{ const grid=$('#albumGrid'); grid.innerHTML=''; slideImages=[]; const files=Array.from(e.target.files||[]); files.slice(0,24).forEach((f,i)=>{ const url=URL.createObjectURL(f); slideImages.push(url); const frame=document.createElement('figure'); frame.className='relative bg-white rounded-xl p-2 pt-3 shadow-soft'; frame.innerHTML=`<img src="${url}" alt="photo" class="w-full h-36 object-cover rounded-lg select-none"/><figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`; grid.appendChild(frame); }); startSlide(); saveState(); });
+    function startSlide(){
+      clearInterval(slideTimer);
+      const img = $('#slideImage');
+      if(!slideImages.length){
+        if(img) img.src = defaultGateSources[0] || '';
+        return;
+      }
+      if(img) img.src = slideImages[slideIdx % slideImages.length];
+      slideTimer = setInterval(()=>{
+        slideIdx = (slideIdx + 1) % slideImages.length;
+        if(img) img.src = slideImages[slideIdx];
+      }, slideSeconds*1000);
+    }
+    $('#photoInput').addEventListener('change', (e)=>{
+      const files = Array.from(e.target.files||[]).slice(0,24);
+      const urls = files.map(f=> URL.createObjectURL(f));
+      slideImages = normalizeImageList(urls);
+      slideIdx = 0;
+      renderAlbumGrid(slideImages);
+      startSlide();
+      refreshGateSources();
+      saveState();
+    });
 
     // Music
     function parseYouTube(url){ try{ const u=new URL(url); if(u.hostname.includes('youtu.be')) return u.pathname.slice(1); if(u.searchParams.get('v')) return u.searchParams.get('v'); return null; }catch(e){ return null; } }
@@ -820,6 +841,7 @@
       return null;
     }
     async function loadFromGitHubFolder(url){
+      if(/^\.\./.test(url)){ alert('Vui lòng chọn thư mục ảnh trên GitHub (không hỗ trợ ../photos).'); return; }
       const info=parseGitFolder(url);
       if(!info){ alert('Link không hợp lệ. Dùng dạng https://github.com/user/repo/tree/branch/folder'); return; }
       const api=`https://api.github.com/repos/${info.owner}/${info.repo}/contents/${info.path}?ref=${encodeURIComponent(info.branch)}`;
@@ -828,7 +850,24 @@
       const data=await res.json();
       const imgs=(data||[]).filter(x=>x.type==='file' && /\.(png|jpg|jpeg|gif|webp)$/i.test(x.name)).map(x=>x.download_url);
       if(imgs.length===0){ alert('Thư mục không có ảnh phù hợp'); return; }
-      slideImages=imgs; renderAlbumGrid(imgs); (function start(){ clearInterval(slideTimer); let i=0; if(slideImages.length){ $('#slideImage').src=slideImages[0]; slideTimer=setInterval(()=>{ i=(i+1)%slideImages.length; $('#slideImage').src=slideImages[i]; }, SLIDE_SECONDS*1000); } })(); refreshGateSources(); GH_FOLDER_URL=url; saveState();
+      slideImages = normalizeImageList(imgs);
+      slideIdx = 0;
+      renderAlbumGrid(slideImages);
+      (function start(){
+        clearInterval(slideTimer);
+        let i=0;
+        if(slideImages.length){
+          const img=$('#slideImage');
+          if(img) img.src=slideImages[0];
+          slideTimer=setInterval(()=>{
+            i=(i+1)%slideImages.length;
+            if(img) img.src=slideImages[i];
+          }, SLIDE_SECONDS*1000);
+        }
+      })();
+      refreshGateSources();
+      GH_FOLDER_URL=url;
+      saveState();
     }
     const ghBtn=document.getElementById('loadGh'); if(ghBtn){ ghBtn.addEventListener('click', ()=>{ const url=$('#ghFolder').value.trim(); if(url) loadFromGitHubFolder(url); }); }
 
@@ -836,8 +875,25 @@
     function currentState(){ return { startLove: $('#startLove').value, wishes: $$('#wishList li span:last-child').map(s=>s.textContent), promiseHim: $$('#promiseHimList li').map(li=>li.textContent), promiseHer: $$('#promiseHerList li').map(li=>li.textContent), timeline: $$('#timelineList li').map(li=>({ date: li.querySelector('time').textContent, title: li.querySelector('h4').textContent, note: li.querySelector('p').textContent })), musicUrl: $('#musicUrl').value, slideImages, ghFolder: GH_FOLDER_URL }; }
     function saveState(){ try{ localStorage.setItem('love20_state', JSON.stringify(currentState())); }catch(e){} }
     function loadState(){ try{ const raw=localStorage.getItem('love20_state'); if(!raw) return; const s=JSON.parse(raw); if(s.startLove) $('#startLove').value=s.startLove; (s.wishes||[]).forEach(t=>{ addWish(t); }); (s.promiseHim||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHimList').appendChild(li); }); (s.promiseHer||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHerList').appendChild(li); }); (s.timeline||[]).forEach(x=>{ const li=document.createElement('li'); li.className='ms-2'; li.innerHTML=`<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div><time class="text-sm text-slate-500">${escapeHtml(x.date)}</time><h4 class="font-semibold">${escapeHtml(x.title)}</h4><p class="text-slate-700">${escapeHtml(x.note||'')}</p>`; $('#timelineList').appendChild(li); }); if(s.musicUrl){ $('#musicUrl').value=s.musicUrl; }
-      if(Array.isArray(s.slideImages) && s.slideImages.length){ slideImages=s.slideImages; renderAlbumGrid(slideImages); (function start(){ clearInterval(slideTimer); let i=0; if(slideImages.length){ $('#slideImage').src=slideImages[0]; slideTimer=setInterval(()=>{ i=(i+1)%slideImages.length; $('#slideImage').src=slideImages[i]; }, SLIDE_SECONDS*1000); } })(); }
-      if(s.ghFolder){ GH_FOLDER_URL=s.ghFolder; const gh=$('#ghFolder'); if(gh) gh.value=GH_FOLDER_URL; }
+      if(Array.isArray(s.slideImages) && s.slideImages.length){
+        slideImages = normalizeImageList(s.slideImages);
+        slideIdx = 0;
+        renderAlbumGrid(slideImages);
+        (function start(){
+          clearInterval(slideTimer);
+          let i=0;
+          if(slideImages.length){
+            const img=$('#slideImage');
+            if(img) img.src=slideImages[0];
+            slideTimer=setInterval(()=>{
+              i=(i+1)%slideImages.length;
+              if(img) img.src=slideImages[i];
+            }, SLIDE_SECONDS*1000);
+          }
+        })();
+        refreshGateSources();
+      }
+      if(s.ghFolder && !/^\.\./.test(s.ghFolder)){ GH_FOLDER_URL=s.ghFolder; const gh=$('#ghFolder'); if(gh) gh.value=GH_FOLDER_URL; }
     }catch(e){}
     }
     document.getElementById('saveAll').addEventListener('click', saveState);
@@ -852,7 +908,7 @@
     // Save / Load
     function currentState(){ return { startLove: $('#startLove').value, wishes: $$('#wishList li span:last-child').map(s=>s.textContent), promiseHim: $$('#promiseHimList li').map(li=>li.textContent), promiseHer: $$('#promiseHerList li').map(li=>li.textContent), timeline: $$('#timelineList li').map(li=>({ date: li.querySelector('time').textContent, title: li.querySelector('h4').textContent, note: li.querySelector('p').textContent })), musicUrl: $('#musicUrl').value, slideImages }; }
     function saveState(){ try{ localStorage.setItem('love20_state', JSON.stringify(currentState())); }catch(e){} }
-    function loadState(){ try{ const raw=localStorage.getItem('love20_state'); if(!raw) return; const s=JSON.parse(raw); if(s.startLove) $('#startLove').value=s.startLove; (s.wishes||[]).forEach(t=>{ addWish(t); }); (s.promiseHim||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHimList').appendChild(li); }); (s.promiseHer||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHerList').appendChild(li); }); (s.timeline||[]).forEach(x=>{ const li=document.createElement('li'); li.className='ms-2'; li.innerHTML=`<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div><time class="text-sm text-slate-500">${escapeHtml(x.date)}</time><h4 class="font-semibold">${escapeHtml(x.title)}</h4><p class="text-slate-700">${escapeHtml(x.note||'')}</p>`; $('#timelineList').appendChild(li); }); if(s.musicUrl){ $('#musicUrl').value=s.musicUrl; playMusicFrom(s.musicUrl); } if(Array.isArray(s.slideImages) && s.slideImages.length){ slideImages=s.slideImages; startSlide(); } $('#stat-wishes').textContent=$$('#wishList li').length; $('#stat-promises').textContent=$$('#promiseHimList li').length + $$('#promiseHerList li').length; $('#stat-timeline').textContent=$$('#timelineList li').length; }catch(e){} }
+    function loadState(){ try{ const raw=localStorage.getItem('love20_state'); if(!raw) return; const s=JSON.parse(raw); if(s.startLove) $('#startLove').value=s.startLove; (s.wishes||[]).forEach(t=>{ addWish(t); }); (s.promiseHim||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHimList').appendChild(li); }); (s.promiseHer||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHerList').appendChild(li); }); (s.timeline||[]).forEach(x=>{ const li=document.createElement('li'); li.className='ms-2'; li.innerHTML=`<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div><time class="text-sm text-slate-500">${escapeHtml(x.date)}</time><h4 class="font-semibold">${escapeHtml(x.title)}</h4><p class="text-slate-700">${escapeHtml(x.note||'')}</p>`; $('#timelineList').appendChild(li); }); if(s.musicUrl){ $('#musicUrl').value=s.musicUrl; playMusicFrom(s.musicUrl); } if(Array.isArray(s.slideImages) && s.slideImages.length){ slideImages = normalizeImageList(s.slideImages); slideIdx = 0; renderAlbumGrid(slideImages); startSlide(); refreshGateSources(); } $('#stat-wishes').textContent=$$('#wishList li').length; $('#stat-promises').textContent=$$('#promiseHimList li').length + $$('#promiseHerList li').length; $('#stat-timeline').textContent=$$('#timelineList li').length; }catch(e){} }
     $('#saveAll').addEventListener('click', saveState);
     $('#exportJson').addEventListener('click', ()=>{ const data=JSON.stringify(currentState(),null,2); const blob=new Blob([data],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='love20-data.json'; a.click(); });
     $('#importJson').addEventListener('change', async (e)=>{ const f=e.target.files[0]; if(!f) return; const text=await f.text(); localStorage.setItem('love20_state', text); location.reload(); });
@@ -897,15 +953,11 @@
     });
     if(s.musicUrl){ document.querySelector('#musicUrl').value=s.musicUrl; }
     if(Array.isArray(s.slideImages) && s.slideImages.length){
-      // render album + slideshow luôn
-      const grid = document.querySelector('#albumGrid'); grid.innerHTML='';
-      s.slideImages.forEach((url,i)=>{
-        const f=document.createElement('figure');
-        f.className='relative bg-white rounded-xl p-2 pt-3 shadow-soft';
-        f.innerHTML=`<img src="${url}" class="w-full h-36 object-cover rounded-lg select-none"/>
-                     <figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`;
-        grid.appendChild(f);
-      });
+      slideImages = normalizeImageList(s.slideImages);
+      slideIdx = 0;
+      renderAlbumGrid(slideImages);
+      startSlide();
+      refreshGateSources();
     }
   }catch(e){}
 })();
