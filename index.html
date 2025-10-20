@@ -55,7 +55,15 @@
     .glass{ background: linear-gradient( to bottom right, var(--glass-bg-1), var(--glass-bg-2) ); backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%); border:1px solid var(--glass-border); box-shadow:0 8px 32px rgba(0,0,0,.10); }
     .btn{ background:var(--accent); color:#fff; border-radius:1rem; padding:.6rem 1rem; font-weight:600; }
     .btn:hover{ box-shadow:0 0 0 8px rgba(244,63,94,.12); transform:translateY(-1px); }
-    .page{ display:none; height:100vh; width:100vw; align-items:center; justify-content:center; padding-top:4.5rem; }
+    .page{
+      display:none;
+      min-height:100vh;
+      width:100vw;
+      align-items:center;
+      justify-content:center;
+      padding:6rem 1.5rem 3rem;
+      box-sizing:border-box;
+    }
     .page.active{ display:flex; animation: pageIn; }
     .page.leaving{ display:flex; animation: pageOut; }
     .widget{ border-radius:1.25rem; transition:transform .25s ease, box-shadow .25s ease; }
@@ -94,6 +102,37 @@
     #gateShow{ cursor: grab; }
     #gateShow.grabbing{ cursor: grabbing; }
     @media (max-width:480px){ .btn{ padding:.55rem .9rem; } .sidebtn{ width:40px; height:40px; } }
+
+    .sidebtn.active{
+      box-shadow:0 0 0 6px rgba(244,63,94,.18), 0 12px 24px rgba(0,0,0,.18);
+      background:linear-gradient(to bottom right, rgba(255,255,255,.7), rgba(255,200,220,.55));
+      transform:translateY(-1px);
+    }
+
+    @media (max-width:768px){
+      html, body{ height:auto; min-height:100%; overflow-x:hidden; overflow-y:auto; }
+      body{ padding-bottom:5.5rem; }
+      body::before{ background-attachment: scroll; }
+      body::after{ backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); }
+      .page{ align-items:flex-start; justify-content:flex-start; padding:5.5rem 1rem 5rem; }
+      #page-content{ padding-bottom:6.5rem; overflow-y:visible; }
+      #topnav nav{ padding-left:1rem; padding-right:1rem; }
+      #topnav .glass{ gap:0.75rem; padding:0.85rem 1rem; }
+      #topnav h1{ font-size:1.1rem; line-height:1.4; }
+      #topnav .text-sm{ font-size:0.8rem; }
+      #navRail{ left:50%; right:auto; top:auto; bottom:1.2rem; transform:translateX(-50%); width:min(420px, calc(100vw - 1.5rem)); }
+      #navRail .glass{ flex-direction:row; align-items:center; justify-content:space-between; gap:0.5rem; padding:0.45rem 0.75rem; border-radius:1.5rem; width:100%; }
+      .sidebtn{ flex:1 1 auto; width:auto; height:48px; border-radius:1rem; }
+      .sidebtn .ico{ --s:22px; }
+      .gate-shell{ height:60vh; }
+    }
+
+    @media (max-width:520px){
+      .page{ padding:5.5rem 0.75rem 5rem; }
+      #navRail{ width:min(360px, calc(100vw - 1.25rem)); }
+      #navRail .glass{ padding:0.35rem 0.5rem; }
+      .sidebtn{ height:44px; }
+    }
   </style>
 </head>
 <body class="font-body text-slate-800 selection:bg-rose-200/70">
@@ -108,7 +147,7 @@
   </header>
 
   <!-- Sidebar điều hướng (icons CSS) -->
-  <aside class="fixed left-3 top-24 z-30">
+  <aside id="navRail" class="fixed left-3 top-24 z-30">
     <div class="glass rounded-2xl p-2 flex flex-col gap-2">
       <button class="sidebtn" title="Home" data-goto="gate"><span class="ico ico-home"></span></button>
       <button class="sidebtn" title="Đếm ngược" data-goto="countdown"><span class="ico ico-clock"></span></button>
@@ -120,7 +159,7 @@
 
 <!-- PAGE: Gate – Trình chiếu ảnh focus ở giữa, ảnh sau bị mờ -->
 <section id="page-gate" class="page active">
-  <div class="relative w-[92vw] md:w-[78vw] h-[70vh] rounded-3xl overflow-hidden glass">
+  <div class="gate-shell relative w-[92vw] md:w-[78vw] h-[70vh] rounded-3xl overflow-hidden glass">
     <div id="gateShow" class="absolute inset-0 grid place-items-center">
 
       <!-- Ảnh trước (mờ, lệch trái) -->
@@ -668,6 +707,11 @@
 
     const pages = { gate: $('#page-gate'), countdown: $('#page-countdown'), intro: $('#page-intro'), content: $('#page-content'), timeline: $('#page-timeline') };
     let current = 'gate';
+    const navButtons = $$('#navRail [data-goto]');
+    function setActiveNav(target){
+      navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.goto === target));
+    }
+    setActiveNav(current);
     function show(page){
       if(page===current) return;
       const from = pages[current], to = pages[page];
@@ -718,6 +762,7 @@
       to.scrollTop = 0;
       }
 
+      setActiveNav(page);
       current = page;
     }
     document.addEventListener('click', e=>{ const b=e.target.closest('[data-goto]'); if(!b) return; show(b.dataset.goto); });
