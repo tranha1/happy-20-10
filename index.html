@@ -55,7 +55,15 @@
     .glass{ background: linear-gradient( to bottom right, var(--glass-bg-1), var(--glass-bg-2) ); backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%); border:1px solid var(--glass-border); box-shadow:0 8px 32px rgba(0,0,0,.10); }
     .btn{ background:var(--accent); color:#fff; border-radius:1rem; padding:.6rem 1rem; font-weight:600; }
     .btn:hover{ box-shadow:0 0 0 8px rgba(244,63,94,.12); transform:translateY(-1px); }
-    .page{ display:none; height:100vh; width:100vw; align-items:center; justify-content:center; padding-top:4.5rem; }
+    .page{
+      display:none;
+      min-height:100vh;
+      width:100vw;
+      align-items:center;
+      justify-content:center;
+      padding:6rem 1.5rem 3rem;
+      box-sizing:border-box;
+    }
     .page.active{ display:flex; animation: pageIn; }
     .page.leaving{ display:flex; animation: pageOut; }
     .widget{ border-radius:1.25rem; transition:transform .25s ease, box-shadow .25s ease; }
@@ -94,6 +102,37 @@
     #gateShow{ cursor: grab; }
     #gateShow.grabbing{ cursor: grabbing; }
     @media (max-width:480px){ .btn{ padding:.55rem .9rem; } .sidebtn{ width:40px; height:40px; } }
+
+    .sidebtn.active{
+      box-shadow:0 0 0 6px rgba(244,63,94,.18), 0 12px 24px rgba(0,0,0,.18);
+      background:linear-gradient(to bottom right, rgba(255,255,255,.7), rgba(255,200,220,.55));
+      transform:translateY(-1px);
+    }
+
+    @media (max-width:768px){
+      html, body{ height:auto; min-height:100%; overflow-x:hidden; overflow-y:auto; }
+      body{ padding-bottom:5.5rem; }
+      body::before{ background-attachment: scroll; }
+      body::after{ backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); }
+      .page{ align-items:flex-start; justify-content:flex-start; padding:5.5rem 1rem 5rem; }
+      #page-content{ padding-bottom:6.5rem; overflow-y:visible; }
+      #topnav nav{ padding-left:1rem; padding-right:1rem; }
+      #topnav .glass{ gap:0.75rem; padding:0.85rem 1rem; }
+      #topnav h1{ font-size:1.1rem; line-height:1.4; }
+      #topnav .text-sm{ font-size:0.8rem; }
+      #navRail{ left:50%; right:auto; top:auto; bottom:1.2rem; transform:translateX(-50%); width:min(420px, calc(100vw - 1.5rem)); }
+      #navRail .glass{ flex-direction:row; align-items:center; justify-content:space-between; gap:0.5rem; padding:0.45rem 0.75rem; border-radius:1.5rem; width:100%; }
+      .sidebtn{ flex:1 1 auto; width:auto; height:48px; border-radius:1rem; }
+      .sidebtn .ico{ --s:22px; }
+      .gate-shell{ height:60vh; }
+    }
+
+    @media (max-width:520px){
+      .page{ padding:5.5rem 0.75rem 5rem; }
+      #navRail{ width:min(360px, calc(100vw - 1.25rem)); }
+      #navRail .glass{ padding:0.35rem 0.5rem; }
+      .sidebtn{ height:44px; }
+    }
   </style>
 </head>
 <body class="font-body text-slate-800 selection:bg-rose-200/70">
@@ -108,7 +147,7 @@
   </header>
 
   <!-- Sidebar điều hướng (icons CSS) -->
-  <aside class="fixed left-3 top-24 z-30">
+  <aside id="navRail" class="fixed left-3 top-24 z-30">
     <div class="glass rounded-2xl p-2 flex flex-col gap-2">
       <button class="sidebtn" title="Home" data-goto="gate"><span class="ico ico-home"></span></button>
       <button class="sidebtn" title="Đếm ngược" data-goto="countdown"><span class="ico ico-clock"></span></button>
@@ -120,7 +159,7 @@
 
 <!-- PAGE: Gate – Trình chiếu ảnh focus ở giữa, ảnh sau bị mờ -->
 <section id="page-gate" class="page active">
-  <div class="relative w-[92vw] md:w-[78vw] h-[70vh] rounded-3xl overflow-hidden glass">
+  <div class="gate-shell relative w-[92vw] md:w-[78vw] h-[70vh] rounded-3xl overflow-hidden glass">
     <div id="gateShow" class="absolute inset-0 grid place-items-center">
 
       <!-- Ảnh trước (mờ, lệch trái) -->
@@ -668,6 +707,111 @@
 
     const pages = { gate: $('#page-gate'), countdown: $('#page-countdown'), intro: $('#page-intro'), content: $('#page-content'), timeline: $('#page-timeline') };
     let current = 'gate';
+    const navButtons = $$('#navRail [data-goto]');
+    function setActiveNav(target){
+      navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.goto === target));
+    }
+    setActiveNav(current);
+
+    const gatePrev = $('#gatePrev');
+    const gateCurr = $('#gateCurr');
+    const gateNext = $('#gateNext');
+    const gateDots = $('#gateDots');
+    const DEFAULT_GATE_IMAGES = [
+      'photos/gallery/anh1.jpg',
+      'photos/gallery/anh2.jpg',
+      'photos/gallery/anh3.jpg'
+    ];
+
+    const hasProtocol = (url) => /^[a-z][a-z0-9+.-]*:/i.test(url);
+
+    function resolvePhotoUrl(url){
+      if(!url) return '';
+      let cleaned = String(url).trim();
+      if(!cleaned) return '';
+      if(cleaned.startsWith('//')) return window.location.protocol + cleaned;
+      if(hasProtocol(cleaned)) return cleaned;
+      cleaned = cleaned.replace(/^\.\.\/photos\//, 'photos/');
+      cleaned = cleaned.replace(/^\.\//, '');
+      cleaned = cleaned.replace(/^\/+/, '');
+      return cleaned;
+    }
+
+    function toDisplayUrl(url){
+      const cleaned = resolvePhotoUrl(url);
+      if(!cleaned) return '';
+      if(hasProtocol(cleaned)) return cleaned;
+      try{ return new URL(cleaned, document.baseURI).href; }catch(e){ return cleaned; }
+    }
+
+    function normalizeImageList(list){
+      return (Array.isArray(list) ? list : []).map(toDisplayUrl).filter(Boolean);
+    }
+
+    const defaultGateSources = normalizeImageList(DEFAULT_GATE_IMAGES);
+
+    function renderAlbumGrid(images){
+      const grid = $('#albumGrid');
+      if(!grid) return;
+      grid.innerHTML = '';
+      (images || []).forEach((raw, i)=>{
+        const url = toDisplayUrl(raw);
+        if(!url) return;
+        const figure = document.createElement('figure');
+        figure.className = 'relative bg-white rounded-xl p-2 pt-3 shadow-soft';
+        figure.innerHTML = `<img src="${url}" alt="photo ${i+1}" class="w-full h-36 object-cover rounded-lg select-none"/>`
+          + `<figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`;
+        grid.appendChild(figure);
+      });
+    }
+
+    function buildGateDots(){
+      if(!gateDots) return;
+      gateDots.innerHTML = '';
+      gateSources.forEach((_, idx)=>{
+        const dot = document.createElement('span');
+        dot.className = 'dot' + (idx === gateIdx ? ' active' : '');
+        dot.addEventListener('click', ()=>{
+          gateIdx = idx;
+          setGateImages();
+          startGateSlide();
+        });
+        gateDots.appendChild(dot);
+      });
+    }
+
+    function setGateImages(){
+      if(!gateSources.length) return;
+      const total = gateSources.length;
+      gateIdx = ((gateIdx % total) + total) % total;
+      if(gatePrev) gatePrev.src = gateSources[(gateIdx - 1 + total) % total];
+      if(gateCurr) gateCurr.src = gateSources[gateIdx];
+      if(gateNext) gateNext.src = gateSources[(gateIdx + 1) % total];
+      if(gateDots){
+        Array.from(gateDots.children).forEach((dot, idx)=>{
+          dot.classList.toggle('active', idx === gateIdx);
+        });
+      }
+    }
+
+    function startGateSlide(){
+      clearInterval(gateTimer);
+      if(gateSources.length <= 1) return;
+      gateTimer = setInterval(()=>{
+        gateIdx = (gateIdx + 1) % gateSources.length;
+        setGateImages();
+      }, 4500);
+    }
+
+    function refreshGateSources(){
+      const sourceList = normalizeImageList(slideImages && slideImages.length ? slideImages : defaultGateSources);
+      if(!sourceList.length) return;
+      gateSources = sourceList;
+      gateIdx = gateIdx % gateSources.length;
+      buildGateDots();
+      setGateImages();
+      startGateSlide();
+    }
     function show(page){
       if(page===current) return;
       const from = pages[current], to = pages[page];
@@ -718,6 +862,7 @@
       to.scrollTop = 0;
       }
 
+      setActiveNav(page);
       current = page;
     }
     document.addEventListener('click', e=>{ const b=e.target.closest('[data-goto]'); if(!b) return; show(b.dataset.goto); });
@@ -745,8 +890,29 @@
 
     // Album + slideshow
     let slideIdx=0; let slideTimer; let slideImages=[]; const slideSeconds=SLIDE_SECONDS; $('#slideSec').textContent = slideSeconds;
-    function startSlide(){ clearInterval(slideTimer); if(slideImages.length===0){ $('#slideImage').src='https://tranha1.github.io/happy-20-10/photos/gallery'; return; } $('#slideImage').src = slideImages[slideIdx % slideImages.length]; slideTimer = setInterval(()=>{ slideIdx=(slideIdx+1)%slideImages.length; $('#slideImage').src = slideImages[slideIdx]; }, slideSeconds*1000); }
-    $('#photoInput').addEventListener('change', (e)=>{ const grid=$('#albumGrid'); grid.innerHTML=''; slideImages=[]; const files=Array.from(e.target.files||[]); files.slice(0,24).forEach((f,i)=>{ const url=URL.createObjectURL(f); slideImages.push(url); const frame=document.createElement('figure'); frame.className='relative bg-white rounded-xl p-2 pt-3 shadow-soft'; frame.innerHTML=`<img src="${url}" alt="photo" class="w-full h-36 object-cover rounded-lg select-none"/><figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`; grid.appendChild(frame); }); startSlide(); saveState(); });
+    function startSlide(){
+      clearInterval(slideTimer);
+      const img = $('#slideImage');
+      if(!slideImages.length){
+        if(img) img.src = defaultGateSources[0] || '';
+        return;
+      }
+      if(img) img.src = slideImages[slideIdx % slideImages.length];
+      slideTimer = setInterval(()=>{
+        slideIdx = (slideIdx + 1) % slideImages.length;
+        if(img) img.src = slideImages[slideIdx];
+      }, slideSeconds*1000);
+    }
+    $('#photoInput').addEventListener('change', (e)=>{
+      const files = Array.from(e.target.files||[]).slice(0,24);
+      const urls = files.map(f=> URL.createObjectURL(f));
+      slideImages = normalizeImageList(urls);
+      slideIdx = 0;
+      renderAlbumGrid(slideImages);
+      startSlide();
+      refreshGateSources();
+      saveState();
+    });
 
     // Music
     function parseYouTube(url){ try{ const u=new URL(url); if(u.hostname.includes('youtu.be')) return u.pathname.slice(1); if(u.searchParams.get('v')) return u.searchParams.get('v'); return null; }catch(e){ return null; } }
@@ -775,6 +941,7 @@
       return null;
     }
     async function loadFromGitHubFolder(url){
+      if(/^\.\./.test(url)){ alert('Vui lòng chọn thư mục ảnh trên GitHub (không hỗ trợ ../photos).'); return; }
       const info=parseGitFolder(url);
       if(!info){ alert('Link không hợp lệ. Dùng dạng https://github.com/user/repo/tree/branch/folder'); return; }
       const api=`https://api.github.com/repos/${info.owner}/${info.repo}/contents/${info.path}?ref=${encodeURIComponent(info.branch)}`;
@@ -783,7 +950,24 @@
       const data=await res.json();
       const imgs=(data||[]).filter(x=>x.type==='file' && /\.(png|jpg|jpeg|gif|webp)$/i.test(x.name)).map(x=>x.download_url);
       if(imgs.length===0){ alert('Thư mục không có ảnh phù hợp'); return; }
-      slideImages=imgs; renderAlbumGrid(imgs); (function start(){ clearInterval(slideTimer); let i=0; if(slideImages.length){ $('#slideImage').src=slideImages[0]; slideTimer=setInterval(()=>{ i=(i+1)%slideImages.length; $('#slideImage').src=slideImages[i]; }, SLIDE_SECONDS*1000); } })(); refreshGateSources(); GH_FOLDER_URL=url; saveState();
+      slideImages = normalizeImageList(imgs);
+      slideIdx = 0;
+      renderAlbumGrid(slideImages);
+      (function start(){
+        clearInterval(slideTimer);
+        let i=0;
+        if(slideImages.length){
+          const img=$('#slideImage');
+          if(img) img.src=slideImages[0];
+          slideTimer=setInterval(()=>{
+            i=(i+1)%slideImages.length;
+            if(img) img.src=slideImages[i];
+          }, SLIDE_SECONDS*1000);
+        }
+      })();
+      refreshGateSources();
+      GH_FOLDER_URL=url;
+      saveState();
     }
     const ghBtn=document.getElementById('loadGh'); if(ghBtn){ ghBtn.addEventListener('click', ()=>{ const url=$('#ghFolder').value.trim(); if(url) loadFromGitHubFolder(url); }); }
 
@@ -791,8 +975,25 @@
     function currentState(){ return { startLove: $('#startLove').value, wishes: $$('#wishList li span:last-child').map(s=>s.textContent), promiseHim: $$('#promiseHimList li').map(li=>li.textContent), promiseHer: $$('#promiseHerList li').map(li=>li.textContent), timeline: $$('#timelineList li').map(li=>({ date: li.querySelector('time').textContent, title: li.querySelector('h4').textContent, note: li.querySelector('p').textContent })), musicUrl: $('#musicUrl').value, slideImages, ghFolder: GH_FOLDER_URL }; }
     function saveState(){ try{ localStorage.setItem('love20_state', JSON.stringify(currentState())); }catch(e){} }
     function loadState(){ try{ const raw=localStorage.getItem('love20_state'); if(!raw) return; const s=JSON.parse(raw); if(s.startLove) $('#startLove').value=s.startLove; (s.wishes||[]).forEach(t=>{ addWish(t); }); (s.promiseHim||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHimList').appendChild(li); }); (s.promiseHer||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHerList').appendChild(li); }); (s.timeline||[]).forEach(x=>{ const li=document.createElement('li'); li.className='ms-2'; li.innerHTML=`<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div><time class="text-sm text-slate-500">${escapeHtml(x.date)}</time><h4 class="font-semibold">${escapeHtml(x.title)}</h4><p class="text-slate-700">${escapeHtml(x.note||'')}</p>`; $('#timelineList').appendChild(li); }); if(s.musicUrl){ $('#musicUrl').value=s.musicUrl; }
-      if(Array.isArray(s.slideImages) && s.slideImages.length){ slideImages=s.slideImages; renderAlbumGrid(slideImages); (function start(){ clearInterval(slideTimer); let i=0; if(slideImages.length){ $('#slideImage').src=slideImages[0]; slideTimer=setInterval(()=>{ i=(i+1)%slideImages.length; $('#slideImage').src=slideImages[i]; }, SLIDE_SECONDS*1000); } })(); }
-      if(s.ghFolder){ GH_FOLDER_URL=s.ghFolder; const gh=$('#ghFolder'); if(gh) gh.value=GH_FOLDER_URL; }
+      if(Array.isArray(s.slideImages) && s.slideImages.length){
+        slideImages = normalizeImageList(s.slideImages);
+        slideIdx = 0;
+        renderAlbumGrid(slideImages);
+        (function start(){
+          clearInterval(slideTimer);
+          let i=0;
+          if(slideImages.length){
+            const img=$('#slideImage');
+            if(img) img.src=slideImages[0];
+            slideTimer=setInterval(()=>{
+              i=(i+1)%slideImages.length;
+              if(img) img.src=slideImages[i];
+            }, SLIDE_SECONDS*1000);
+          }
+        })();
+        refreshGateSources();
+      }
+      if(s.ghFolder && !/^\.\./.test(s.ghFolder)){ GH_FOLDER_URL=s.ghFolder; const gh=$('#ghFolder'); if(gh) gh.value=GH_FOLDER_URL; }
     }catch(e){}
     }
     document.getElementById('saveAll').addEventListener('click', saveState);
@@ -807,7 +1008,7 @@
     // Save / Load
     function currentState(){ return { startLove: $('#startLove').value, wishes: $$('#wishList li span:last-child').map(s=>s.textContent), promiseHim: $$('#promiseHimList li').map(li=>li.textContent), promiseHer: $$('#promiseHerList li').map(li=>li.textContent), timeline: $$('#timelineList li').map(li=>({ date: li.querySelector('time').textContent, title: li.querySelector('h4').textContent, note: li.querySelector('p').textContent })), musicUrl: $('#musicUrl').value, slideImages }; }
     function saveState(){ try{ localStorage.setItem('love20_state', JSON.stringify(currentState())); }catch(e){} }
-    function loadState(){ try{ const raw=localStorage.getItem('love20_state'); if(!raw) return; const s=JSON.parse(raw); if(s.startLove) $('#startLove').value=s.startLove; (s.wishes||[]).forEach(t=>{ addWish(t); }); (s.promiseHim||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHimList').appendChild(li); }); (s.promiseHer||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHerList').appendChild(li); }); (s.timeline||[]).forEach(x=>{ const li=document.createElement('li'); li.className='ms-2'; li.innerHTML=`<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div><time class="text-sm text-slate-500">${escapeHtml(x.date)}</time><h4 class="font-semibold">${escapeHtml(x.title)}</h4><p class="text-slate-700">${escapeHtml(x.note||'')}</p>`; $('#timelineList').appendChild(li); }); if(s.musicUrl){ $('#musicUrl').value=s.musicUrl; playMusicFrom(s.musicUrl); } if(Array.isArray(s.slideImages) && s.slideImages.length){ slideImages=s.slideImages; startSlide(); } $('#stat-wishes').textContent=$$('#wishList li').length; $('#stat-promises').textContent=$$('#promiseHimList li').length + $$('#promiseHerList li').length; $('#stat-timeline').textContent=$$('#timelineList li').length; }catch(e){} }
+    function loadState(){ try{ const raw=localStorage.getItem('love20_state'); if(!raw) return; const s=JSON.parse(raw); if(s.startLove) $('#startLove').value=s.startLove; (s.wishes||[]).forEach(t=>{ addWish(t); }); (s.promiseHim||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHimList').appendChild(li); }); (s.promiseHer||[]).forEach(t=>{ const li=document.createElement('li'); li.className='bg-white/85 rounded-xl px-3 py-2 shadow-soft'; li.textContent=t; $('#promiseHerList').appendChild(li); }); (s.timeline||[]).forEach(x=>{ const li=document.createElement('li'); li.className='ms-2'; li.innerHTML=`<div class="absolute -start-[9px] mt-1 w-4 h-4 rounded-full bg-rose-400 ring-4 ring-rose-100"></div><time class="text-sm text-slate-500">${escapeHtml(x.date)}</time><h4 class="font-semibold">${escapeHtml(x.title)}</h4><p class="text-slate-700">${escapeHtml(x.note||'')}</p>`; $('#timelineList').appendChild(li); }); if(s.musicUrl){ $('#musicUrl').value=s.musicUrl; playMusicFrom(s.musicUrl); } if(Array.isArray(s.slideImages) && s.slideImages.length){ slideImages = normalizeImageList(s.slideImages); slideIdx = 0; renderAlbumGrid(slideImages); startSlide(); refreshGateSources(); } $('#stat-wishes').textContent=$$('#wishList li').length; $('#stat-promises').textContent=$$('#promiseHimList li').length + $$('#promiseHerList li').length; $('#stat-timeline').textContent=$$('#timelineList li').length; }catch(e){} }
     $('#saveAll').addEventListener('click', saveState);
     $('#exportJson').addEventListener('click', ()=>{ const data=JSON.stringify(currentState(),null,2); const blob=new Blob([data],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='love20-data.json'; a.click(); });
     $('#importJson').addEventListener('change', async (e)=>{ const f=e.target.files[0]; if(!f) return; const text=await f.text(); localStorage.setItem('love20_state', text); location.reload(); });
@@ -852,15 +1053,11 @@
     });
     if(s.musicUrl){ document.querySelector('#musicUrl').value=s.musicUrl; }
     if(Array.isArray(s.slideImages) && s.slideImages.length){
-      // render album + slideshow luôn
-      const grid = document.querySelector('#albumGrid'); grid.innerHTML='';
-      s.slideImages.forEach((url,i)=>{
-        const f=document.createElement('figure');
-        f.className='relative bg-white rounded-xl p-2 pt-3 shadow-soft';
-        f.innerHTML=`<img src="${url}" class="w-full h-36 object-cover rounded-lg select-none"/>
-                     <figcaption class="text-center text-xs mt-2 text-slate-600">Kỉ niệm ${i+1}</figcaption>`;
-        grid.appendChild(f);
-      });
+      slideImages = normalizeImageList(s.slideImages);
+      slideIdx = 0;
+      renderAlbumGrid(slideImages);
+      startSlide();
+      refreshGateSources();
     }
   }catch(e){}
 })();
